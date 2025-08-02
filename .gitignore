@@ -1,0 +1,12 @@
+.DS_Store
+.build
+xcuserdata/
+.swiftpm/configuration/
+.swiftpm/xcode/package.xcworkspace/
+Notes
+bin/
+Package.resolved
+.idea
+*.epub
+*.m4b
+

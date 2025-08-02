@@ -1,0 +1,10 @@
+{
+  "audioBookSource" : "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook",
+  "epubSource" : "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook - for Kobo version",
+  "testConfigs": [
+    {
+      "modelName": "ggml-tiny.en.bin",
+      "expectedSha256": "e583226f1579c808bdf78299f100ad5b26371fff3ddd70622b85983b75840c2a"
+    },
+  ]
+}

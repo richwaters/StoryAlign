@@ -1,0 +1,39 @@
+{
+  "configurations" : [
+    {
+      "id" : "359BF710-CACA-4D93-A911-B2396BB7F920",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "--model=\/opt\/whisper_models\/ggml-tiny.bin  --output  \/Users\/raw\/Desktop\/Roses.epub3  \/Users\/raw\/Desktop\/A_Court_of_Thorns_and_Roses.epub  \/Users\/raw\/Desktop\/A_Court_of_Thorns_and_Roses.m4b"
+      }
+    ],
+    "environmentVariableEntries" : [
+      {
+        "key" : "PATH",
+        "value" : "\/opt\/homebrew\/bin:\/usr\/local\/bin:\/usr\/bin:\/bin:\/usr\/sbin:\/sbin"
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "story-align",
+      "name" : "story-align"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "StoryAlignTests",
+        "name" : "StoryAlignTests"
+      }
+    }
+  ],
+  "version" : 1
+}

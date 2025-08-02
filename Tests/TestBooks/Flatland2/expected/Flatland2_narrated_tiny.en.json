@@ -1,0 +1,303 @@
+{
+  "alignmentStats" : {
+    "chapterSentenceCount" : 1298,
+    "exactMatches" : 15,
+    "interpolated" : 5,
+    "matchesIgnoringAllPunctuation" : 273,
+    "matchesIgnoringEndsPunctuation" : 126,
+    "missedChapterSentences" : 3,
+    "missedChapters" : 1,
+    "nearMatchs" : 638,
+    "recoverable" : 18,
+    "skipped" : 27,
+    "trimmedLeadingMatches" : 220
+  },
+  "audioPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2.m4b",
+  "beamSize" : 7,
+  "epubPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2.epub",
+  "fastPaceSentences" : [
+    {
+      "chapterId" : "chapter-5.xhtml",
+      "chapterName" : "V: Of Our Methods of Recognizing",
+      "sentences" : [
+        {
+          "chapterSentence" : "You, who are blessed with shade as well as light, you, who are gifted with two eyes, endowed with a knowledge of perspective, and charmed with the enjoyment of various colours, you, who can actually see an angle, and contemplate the complete circumference of a circle in the happy region of the Three Dimensions⁠—how shall I make clear to you the extreme difficulty which we in Flatland experience in recognizing one another's configuration?",
+          "chapterSentenceId" : 2,
+          "duration" : 33.86,
+          "pace" : 0.46383561643835614,
+          "transcriptionSentence" : " You who are blessed with shade as well as light , you who are gifted with two eyes and dad with a knowledge of perspective , and charmed with the enjoyment of various colours. You , who can actually see an angle , and contemplate the complete circumference of a circle in the happy region of the three dimensions. How shall I make it clear to you the extreme difficulty , which we in flatland experience and recognizing one another's configuration.",
+          "zscore" : -9.671435993494114
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-11.xhtml",
+      "chapterName" : "XI: Concerning Our Priests",
+      "sentences" : [
+        {
+          "chapterSentence" : "It is high time that I should pass from these brief and discursive notes about things in Flatland to the central event of this book, my initiation into the mysteries of Space.",
+          "chapterSentenceId" : 2,
+          "duration" : 5.053000000000001,
+          "pace" : 0.15790625000000003,
+          "transcriptionSentence" : " My initiation into the mysteries of space.",
+          "zscore" : -3.4101135460317518
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-15.xhtml",
+      "chapterName" : "XV: Concerning a Stranger from S",
+      "sentences" : [
+        {
+          "chapterSentence" : "So my grandson had disappeared in disgrace; and there I sat by my wife's side, endeavouring to form a retrospect of the year one thousand nine hundred ninety-nine and of the possibilities of the year two thousand, but not quite able to shake off the thoughts suggested by the prattle of my bright little Hexagon.",
+          "chapterSentenceId" : 14,
+          "duration" : 21.239999999999952,
+          "pace" : 0.3861818181818173,
+          "transcriptionSentence" : " So my grandson had disappeared in disgrace , and there I sat by my wife's side , endeavoring to form a retrospect of the year one thousand nine hundred ninety-nine, and of the possibilities of the year two thousand, but not quite able to shake off the thoughts suggested by the prattle of my bright little hexagon.",
+          "zscore" : -4.797132712652801
+        },
+        {
+          "chapterSentence" : "Then he added more mildly, \"I have a message, dear Madam, to your husband, which I must not deliver in your presence; and, if you would suffer us to retire for a few minutes⁠—\" But my wife would not listen to the proposal that our august visitor should so incommode himself, and assuring the Circle that the hour of her own retirement had long passed, with many reiterated apologies for her recent indiscretion, she at last retreated to her apartment.",
+          "chapterSentenceId" : 42,
+          "duration" : 29.519999999999982,
+          "pace" : 0.3689999999999998,
+          "transcriptionSentence" : " Then he added more mildly. I have a message , dear madam , to your husband , which I must not deliver in your presence , and if you would suffer us to retire for a few minutes. But my wife would not listen to the proposal that our August visitor should sow in commode himself , and assuring the circle that the hour of her own retirement had long passed , with many reiterated apologies for her recent indiscretion she had last retreated to her apartment.",
+          "zscore" : -26.432773201373458
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-16.xhtml",
+      "chapterName" : "XVI: How the Stranger Vainly End",
+      "sentences" : [
+        {
+          "chapterSentence" : "Stranger.",
+          "chapterSentenceId" : 13,
+          "duration" : 0.09999999999999432,
+          "pace" : 0.09999999999999432,
+          "transcriptionSentence" : " \"",
+          "zscore" : -2.3151911639765745
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-17.xhtml",
+      "chapterName" : "XVII: How the Sphere, Having in ",
+      "sentences" : [
+        {
+          "chapterSentence" : "For example, I am ascending; now I can see your neighbour the Hexagon and his family in their several apartments; now I see the inside of the Theatre, ten doors off, from which the audience is only just departing; and on the other side a Circle in his study, sitting at his books.",
+          "chapterSentenceId" : 31,
+          "duration" : 16.460000000000008,
+          "pace" : 0.31056603773584923,
+          "transcriptionSentence" : " For example , I am ascending , now I can see your neighbor the hexagon and his family in their several apartments , now I see the inside of the theater , ten doors off from which the audience is only just departing , and on the other side a circle in his study sitting at his books.",
+          "zscore" : -4.736685687266238
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-19.xhtml",
+      "chapterName" : "XIX: How, Though the Sphere Show",
+      "sentences" : [
+        {
+          "chapterSentence" : "What therefore more easy than now to take his servant on a second journey into the blessed region of the Fourth Dimension, where I shall look down with him once more upon this land of Three Dimensions, and see the inside of every three-dimensioned house, the secrets of the solid earth, the treasures of the mines in Spaceland, and the intestines of every solid living creature, even of the noble and adorable Spheres.",
+          "chapterSentenceId" : 52,
+          "duration" : 28.528999999999996,
+          "pace" : 0.3908082191780821,
+          "transcriptionSentence" : " What therefore more easy than now to take a servant on a second journey into the blessed region of the fourth dimension , where I shall look down with him once more upon this land of three dimensions and see the inside of every three dimension touse. The secrets of the solid earth , the treasures , the minds of space-land , and the intestines of every solid living creature , even the noble and adorable spheres ,",
+          "zscore" : -4.901359134019162
+        },
+        {
+          "chapterSentence" : "Nay, I despair not that, even here, in this region of Three Dimensions, your Lordship's art may make the Fourth Dimension visible to me; just as in the Land of Two Dimensions my teacher's skill would fain have opened the eyes of his blind servant to the invisible presence of a Third Dimension, though I saw it not.",
+          "chapterSentenceId" : 60,
+          "duration" : 20.82000000000005,
+          "pace" : 0.35896551724138015,
+          "transcriptionSentence" : " Nay , I despair not that Even here in this region of three dimensions , your lordships art may make the fourth dimension visible to me , just as in the land of two dimensions my teacher's skill would feign have opened the eyes of his blind servant to the invisible presence of a third dimension , though I saw it not.",
+          "zscore" : -5.365114065729289
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-21.xhtml",
+      "chapterName" : "XXI: How I Tried to Teach the Th",
+      "sentences" : [
+        {
+          "chapterSentence" : "Discussing the matter with him, a mere boy, I should be in perfect safety; for he would know nothing of the Proclamation of the Council; whereas I could not feel sure that my sons⁠—so greatly did their patriotism and reverence for the Circles predominate over mere blind affection⁠—might not feel compelled to hand me over to the Prefect, if they found me seriously maintaining the seditious heresy of the Third Dimension.",
+          "chapterSentenceId" : 19,
+          "duration" : 26.289999999999992,
+          "pace" : 0.37028169014084494,
+          "transcriptionSentence" : " Discussing the matter with him a mere boy I should be in perfect safety for he would know nothing of the proclamation of the council , whereas I could not feel sure that my sons , so greatly did their patriotism and reverence for the circles predominate over mere blind affection , might not feel compelled to hand me over to the prefect if they found me seriously maintaining the seditious heresy of the third dimension.",
+          "zscore" : -4.9559554759324715
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-22.xhtml",
+      "chapterName" : "XXII: How I Then Tried to Diffus",
+      "sentences" : [
+        {
+          "chapterSentence" : "Only, with the view of evading the law, if possible, I spoke not of a physical Dimension, but of a Thoughtland whence, in theory, a Figure could look down upon Flatland and see simultaneously the insides of all things, and where it was possible that there might be supposed to exist a Figure environed, as it were, with six Squares, and containing eight terminal Points.",
+          "chapterSentenceId" : 5,
+          "duration" : 25,
+          "pace" : 0.38461538461538464,
+          "transcriptionSentence" : " Only , with the view of evading the law , if possible , I spoke not of a physical dimension , but of a thought land , whence , in theory , a figure could look down upon flatland and see simultaneously the insides of all things , and where it was possible that there might be supposed to exist , a figure invariant as it were with six squares and containing eight terminal points.",
+          "zscore" : -4.091510713584171
+        }
+      ]
+    }
+  ],
+  "longDurationSentences" : [
+
+  ],
+  "missingChapterSentences" : [
+    {
+      "chapterName" : "Part I: This World",
+      "sentences" : [
+        " Part I ",
+        "This World",
+        "“Be patient, for the world is broad and wide.”"
+      ]
+    }
+  ],
+  "modelName" : "ggml-tiny.en",
+  "outputPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2_narrated_tiny.en.epub",
+  "rebuiltSentences" : [
+    {
+      "chapterId" : "chapter-1.xhtml",
+      "chapterName" : "I: Of the Nature of Flatland",
+      "sentences" : [
+        {
+          "chapterSentence" : "I",
+          "chapterSentenceId" : 0,
+          "duration" : 0.253,
+          "pace" : 0.253,
+          "transcriptionSentence" : "I"
+        },
+        {
+          "chapterSentence" : "Of the Nature of Flatland",
+          "chapterSentenceId" : 1,
+          "duration" : 5.282,
+          "pace" : 1.0564,
+          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
+        },
+        {
+          "chapterSentence" : "I call our world Flatland, not because we call it so, but to make its nature clearer to you, my happy readers, who are privileged to live in Space.",
+          "chapterSentenceId" : 2,
+          "duration" : 31.435,
+          "pace" : 1.0839655172413794,
+          "transcriptionSentence" : " call our world flatland , not because we call it so , but to make its nature clearer to you my happy readers who are privileged to live in space.\""
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-21.xhtml",
+      "chapterName" : "XXI: How I Tried to Teach the Th",
+      "sentences" : [
+        {
+          "chapterSentence" : "How silly it is!",
+          "chapterSentenceId" : 36,
+          "duration" : 1.1380000000000337,
+          "pace" : 0.2845000000000084,
+          "transcriptionSentence" : " how silly it is."
+        },
+        {
+          "chapterSentence" : "Ha!",
+          "chapterSentenceId" : 37,
+          "duration" : 0.37899999999996226,
+          "pace" : 0.37899999999996226,
+          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
+        },
+        {
+          "chapterSentence" : "ha!",
+          "chapterSentenceId" : 38,
+          "duration" : 0.3790000000000191,
+          "pace" : 0.3790000000000191,
+          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
+        },
+        {
+          "chapterSentence" : "ha!\"",
+          "chapterSentenceId" : 39,
+          "duration" : 0.45400000000000773,
+          "pace" : 0.45400000000000773,
+          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
+        },
+        {
+          "chapterSentence" : "\"Not at all silly,\" said I, losing my temper; \"here for example, I take this Square,\" and, at the word, I grasped a moveable Square, which was lying at hand⁠—\"and I move it, you see, not Northward but⁠—yes, I move it Upward⁠—that is to say, not Northward, but I move it somewhere⁠—not exactly like this, but somehow⁠—\" Here I brought my sentence to an inane conclusion, shaking the Square about in a purposeless manner, much to the amusement of my grandson, who burst out laughing louder than ever, and declared that I was not teaching him, but joking with him; and so saying he unlocked the door and ran out of the room.",
+          "chapterSentenceId" : 40,
+          "duration" : 40.099999999999966,
+          "pace" : 0.35486725663716784,
+          "transcriptionSentence" : " Not at all silly , I said losing my temper. Here for example , I take this square , and at the word I grasped a movable square which was lying at hand , and I move it , you see , not northward , but yes I move it upward , that is to say northward , but I move it somewhere , not exactly like this , but somehow , here I brought my sentence to an inane conclusion , shaking the square about in a purposeless manner , much to the amusement of my grandson , who burst out laughing louder than ever , and declared that I was not teaching him , but joking with him , and so saying he unlocked the door and ran out of the room."
+        }
+      ]
+    }
+  ],
+  "runtime" : 159.26471710205078,
+  "score" : 98.24,
+  "shortDurationSentences" : [
+
+  ],
+  "slowPaceSentences" : [
+    {
+      "chapterId" : "chapter-15.xhtml",
+      "chapterName" : "XV: Concerning a Stranger from S",
+      "sentences" : [
+        {
+          "chapterSentence" : "The pattering of the rain had long ago announced nightfall; and I was sitting in the company of my wife, musing on the events of the past and the prospects of the coming year, the coming century, the coming Millennium.4",
+          "chapterSentenceId" : 4,
+          "duration" : 52.480000000000004,
+          "pace" : 1.312,
+          "transcriptionSentence" : " The patterning of the rain had long ago announced nightfall , and I was sitting in the company of my wife , musing on the events of the past , and the prospects of the coming near , the coming century , the coming millennium.",
+          "zscore" : 11.854789275744125
+        }
+      ]
+    }
+  ],
+  "stageRunTimes" : [
+    "transcribe",
+    [
+      775001059.011306,
+      775001133.489293
+    ],
+    "audio",
+    [
+      775001057.942629,
+      775001059.011299
+    ],
+    "epub",
+    [
+      775001057.363412,
+      775001057.942611
+    ],
+    "export",
+    [
+      775001213.132425,
+      775001216.628183
+    ],
+    "report",
+    [
+      775001216.628198,
+      775001216.753796
+    ],
+    "align",
+    [
+      775001133.489301,
+      775001212.516533
+    ],
+    "xml",
+    [
+      775001212.516544,
+      775001213.132415
+    ]
+  ],
+  "toolTitle" : "storyalign 0.8-beta1-dev",
+  "transcriptionStats" : {
+    "averagePace" : 0.45608465350857125,
+    "avgSecsPerVoiceLen" : 0.09983105573250178,
+    "endGaps" : 889,
+    "fastPaceThreshold" : 0.15,
+    "fastPaced" : 0,
+    "medianPace" : 0.4311111111111106,
+    "repaired" : 0,
+    "segmentsCount" : 2457,
+    "startGaps" : 980
+  }
+}
