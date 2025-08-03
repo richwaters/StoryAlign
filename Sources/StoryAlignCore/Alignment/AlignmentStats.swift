@@ -240,14 +240,6 @@ public class AlignmentReportBuilder : SessionConfigurable {
         return transcriptionStats
     }
     
-    /*
-     public var fastPaceSentences:[AlignedSentence] {
-     return alignedChapters.flatMap { alignedChapter in
-     return alignedChapter.alignedSentences.filter { $0.secondsPerWord < fastPaceThreshold }
-     }
-     }
-     */
-    
     func chapterReport( from chapter:AlignedChapter, with zscoreTuples:[(AlignedSentence, Double?)] ) -> ChapterReport? {
         guard zscoreTuples.count > 0 else {
             return nil
@@ -270,7 +262,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         let statsByBin = paceStatsByLength(sentences:allInteriorSentences, binSize: binSize)
         
         return alignedChapters.compactMap { chapter in
-            let zscoreTuples = chapter.interiorAlignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
+            let zscoreTuples = chapter.alignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
                 let bin = sentence.chapterSentence.count / binSize
                 guard let (med, mad) = statsByBin[bin] else { return nil }
                 let mz = sentence.secondsPerChar.modifiedZcore( forMedian: med, medianAbsoluteDeviation: mad)
@@ -377,7 +369,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         let fastPacedChapSentenceIds = fastPaceChapterSentenceIds
         
         return alignedChapters.compactMap { chapter in
-            let zscoreTuples = chapter.interiorAlignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
+            let zscoreTuples = chapter.alignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
                 if fastPacedChapSentenceIds.contains(where: { $0.chapterId == chapter.manifestItem.id && $0.sentenceId == sentence.chapterSentenceId }) {
                     return nil
                 }
@@ -577,7 +569,6 @@ public struct AlignmentReportFormatter : SessionConfigurable {
         s +=     "Beam:     \(report.beamSize)\n"
         //}
         s +=  sep2Str
-        //s +=     "Run time: \(durationAsString(runtime))\n"
         s +=     "Run time: \(report.runtime.HHMMSS)\n"
         s +=     "Score:    \(report.score)\n"
         s += sepStr
@@ -616,8 +607,6 @@ public struct AlignmentReportFormatter : SessionConfigurable {
         if report.fastPaceSentences.count > 0 {
             s += "\n\nFast-pace sentences\n-------------------\n"
             s += formatChapterSentences2(report.fastPaceSentences)
-            
-            //s += fastPaceSentences.map { $0.description }.joined(separator:"\n")
         }
             
         if report.slowPaceSentences.count > 0 {

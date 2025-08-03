@@ -29,7 +29,7 @@ public extension OrderedCaseIterable {
 }
 
 
-public enum ProcessingStage: String, Codable, OrderedCaseIterable {
+public enum ProcessingStage: String, Codable, OrderedCaseIterable, CodingKeyRepresentable {
     case epub
     case audio
     case transcribe

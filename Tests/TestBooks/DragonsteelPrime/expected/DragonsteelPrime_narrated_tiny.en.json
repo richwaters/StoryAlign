@@ -12,9 +12,9 @@
     "skipped" : 349,
     "trimmedLeadingMatches" : 4648
   },
-  "audioPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime.m4b",
+  "audioPath" : "file:.\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime.m4b",
   "beamSize" : 7,
-  "epubPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime.epub",
+  "epubPath" : "file:.\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime.epub",
   "fastPaceSentences" : [
     {
       "chapterId" : "ch03.xhtml",
@@ -39,9 +39,31 @@
       ]
     },
     {
+      "chapterId" : "ch04.xhtml",
+      "chapterName" : "Chapter 4",
+      "sentences" : [
+        {
+          "chapterSentence" : "\"Why do you think I had Rodis go back for the horse?\"",
+          "chapterSentenceId" : 426,
+          "duration" : 0.0009999999999763531,
+          "pace" : 8.333333333136277e-05,
+          "transcriptionSentence" : " Why do you think I had rotus go back for the horse ? \"",
+          "zscore" : -5.187704118965189
+        }
+      ]
+    },
+    {
       "chapterId" : "ch05.xhtml",
       "chapterName" : "Chapter 5",
       "sentences" : [
+        {
+          "chapterSentence" : "Chapter Five",
+          "chapterSentenceId" : 0,
+          "duration" : 0.187,
+          "pace" : 0.0935,
+          "transcriptionSentence" : " \"",
+          "zscore" : -3.2676456404275145
+        },
         {
           "chapterSentence" : "\"No room?\"",
           "chapterSentenceId" : 142,
@@ -336,7 +358,7 @@
 
   ],
   "modelName" : "ggml-tiny.en",
-  "outputPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime_narrated_tiny.en.epub",
+  "outputPath" : "file:.\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime_narrated_tiny.en.epub",
   "rebuiltSentences" : [
     {
       "chapterId" : "ch01.xhtml",
@@ -621,8 +643,8 @@
       ]
     }
   ],
-  "runtime" : 489.12117981910706,
-  "score" : 99.23,
+  "runtime" : 465.42895090579987,
+  "score" : 99.22,
   "shortDurationSentences" : [
     {
       "chapterId" : "ch01.xhtml",
@@ -1203,44 +1225,37 @@
       ]
     }
   ],
-  "stageRunTimes" : [
-    "audio",
-    [
-      775020675.313514,
-      775020683.37615
+  "stageRunTimes" : {
+    "align" : [
+      775891842.853747,
+      775891887.778739
     ],
-    "transcribe",
-    [
-      775020683.376158,
-      775021092.688775
+    "audio" : [
+      775891445.470508,
+      775891453.060583
     ],
-    "epub",
-    [
-      775020669.108336,
-      775020675.313499
+    "epub" : [
+      775891440.436025,
+      775891445.470493
     ],
-    "xml",
-    [
-      775021139.913982,
-      775021141.690692
+    "export" : [
+      775891889.662057,
+      775891905.865033
     ],
-    "export",
-    [
-      775021141.690702,
-      775021158.229573
+    "report" : [
+      775891905.865049,
+      775891906.901411
     ],
-    "align",
-    [
-      775021092.688783,
-      775021139.913966
+    "transcribe" : [
+      775891453.06059,
+      775891842.853735
     ],
-    "report",
-    [
-      775021158.229608,
-      775021159.345386
+    "xml" : [
+      775891887.778752,
+      775891889.662047
     ]
-  ],
-  "toolTitle" : "storyalign 0.8-beta1-dev",
+  },
+  "toolTitle" : "storyalign 0.9.1-dev",
   "transcriptionStats" : {
     "averagePace" : 0.3994282799774099,
     "avgSecsPerVoiceLen" : 0.08810826252830038,

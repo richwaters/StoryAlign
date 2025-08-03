@@ -14,7 +14,7 @@ storyalign is based on the storyteller-platform project available here: https://
 ## Quickstart
 Download the zip containing the binary with this command:
 
-`wget https://github.com/richwaters/StoryAlign/releases/latest/download/storyalign-macos-arm64.zip`
+`curl -O -L https://github.com/richwaters/StoryAlign/releases/latest/download/storyalign-macos-arm64.zip`
 
 - unzip the downloaded file
 
@@ -53,7 +53,7 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
 
 **--whisper-model** <file>
       The whisper model file. This is a 'ggml' file compatible with
-      the whisper.cpp library. The 'ggml-tiny.bin' model is appropriate
+      the whisper.cpp library. The 'ggml-tiny.en.bin' model is appropriate
       and best for most cases. If this option is not specified,
       storyalign will download and install the model after prompting for
       confirmation.
@@ -126,7 +126,7 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
 
 
 ## Models & Transcriptions
-storyalign uses the 'whisper.cpp' for transcription of the audio book. That project can be found at: https://github.com/ggml-org/whisper.cpp. By default, storyalign uses the tiny.en model which it downloads installs under a .storyalign directory in the user's home folder. Other models can be downloaded from https://huggingface.co/ggerganov/whisper.cpp/tree/main. For best results, and to avoid a bunch of warnings, the companion .mlmodelc.zip file should be downloaded and installed in the same directory as the model. 
+storyalign uses the 'whisper.cpp' for transcription of the audio book. That project can be found at: https://github.com/ggml-org/whisper.cpp. By default, storyalign uses the tiny.en model which it downloads installs under a .storyalign directory in the user's home folder. Other models can be downloaded from https://huggingface.co/ggerganov/whisper.cpp/tree/main. For best results, and to avoid a bunch of warnings, **the companion .mlmodelc.zip file should be downloaded and installed in the same directory as the .bin model**. 
 
 The large-v3-turbo seems to work the best in most cases, but in some cases the larger models can actually work worse. They can get stuck in a punctuation-less mode, and they can also suffer from the 'beam-search-curse'. To be honest, the whole thing seems a bit of a crap-shoot. In the case of storyalign, you can spend a lot of time trying to get things perfect, but ultimately it's only the difference of a fraction of a percent of sentences being misaligned, and that doesn't have much of an affect on the reading/listening experience.
 

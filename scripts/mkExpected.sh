@@ -15,9 +15,14 @@ MODEL="tiny.en"
 
 NARRATED="${BOOK}_narrated_${MODEL}"
 
+package_root=$(pwd)
+while [ ! -f "$package_root/Package.swift" ] && [ "$package_root" != "/" ]; do
+  package_root=$(dirname "$package_root")
+done
+
 swift run storyalign --report=json --outfile=${NARRATED}.epub ${BOOK}.epub ${BOOK}.m4b
 
-checksum=`../../../scripts/epubstrip.sh ${NARRATED}.epub`
+checksum=`${package_root}/scripts/epubstrip.sh ${NARRATED}.epub`
 
 mv ${NARRATED}.epub.stripped ./expected
 

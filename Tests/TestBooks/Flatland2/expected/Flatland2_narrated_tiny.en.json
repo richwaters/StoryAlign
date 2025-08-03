@@ -12,9 +12,9 @@
     "skipped" : 27,
     "trimmedLeadingMatches" : 220
   },
-  "audioPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2.m4b",
+  "audioPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2.m4b",
   "beamSize" : 7,
-  "epubPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2.epub",
+  "epubPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2.epub",
   "fastPaceSentences" : [
     {
       "chapterId" : "chapter-5.xhtml",
@@ -159,7 +159,7 @@
     }
   ],
   "modelName" : "ggml-tiny.en",
-  "outputPath" : "file:\/\/\/Users\/raw\/devel\/StoryAlign\/Tests\/TestBooks\/Flatland2\/Flatland2_narrated_tiny.en.epub",
+  "outputPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2_narrated_tiny.en.epub",
   "rebuiltSentences" : [
     {
       "chapterId" : "chapter-1.xhtml",
@@ -230,7 +230,7 @@
       ]
     }
   ],
-  "runtime" : 159.26471710205078,
+  "runtime" : 122.87329983711243,
   "score" : 98.24,
   "shortDurationSentences" : [
 
@@ -251,44 +251,37 @@
       ]
     }
   ],
-  "stageRunTimes" : [
-    "transcribe",
-    [
-      775001059.011306,
-      775001133.489293
+  "stageRunTimes" : {
+    "align" : [
+      775891275.325549,
+      775891338.425778
     ],
-    "audio",
-    [
-      775001057.942629,
-      775001059.011299
+    "audio" : [
+      775891219.521281,
+      775891220.543304
     ],
-    "epub",
-    [
-      775001057.363412,
-      775001057.942611
+    "epub" : [
+      775891219.049116,
+      775891219.521253
     ],
-    "export",
-    [
-      775001213.132425,
-      775001216.628183
+    "export" : [
+      775891338.95041,
+      775891341.92248
     ],
-    "report",
-    [
-      775001216.628198,
-      775001216.753796
+    "report" : [
+      775891341.922505,
+      775891342.021368
     ],
-    "align",
-    [
-      775001133.489301,
-      775001212.516533
+    "transcribe" : [
+      775891220.543313,
+      775891275.325542
     ],
-    "xml",
-    [
-      775001212.516544,
-      775001213.132415
+    "xml" : [
+      775891338.425789,
+      775891338.950401
     ]
-  ],
-  "toolTitle" : "storyalign 0.8-beta1-dev",
+  },
+  "toolTitle" : "storyalign 0.9.1-dev",
   "transcriptionStats" : {
     "averagePace" : 0.45608465350857125,
     "avgSecsPerVoiceLen" : 0.09983105573250178,
