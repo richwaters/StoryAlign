@@ -56,7 +56,9 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
       the whisper.cpp library. The 'ggml-tiny.en.bin' model is appropriate
       and best for most cases. If this option is not specified,
       storyalign will download and install the model after prompting for
-      confirmation.
+      confirmation. If you do specify a model file, make sure the companion
+      .mlmodelc files are installed the same location as the specified .bin
+      file.
 
 **--log-level**=(debug|info|timestamp|warn|error)
       Set the level of logging output. Defaults to 'warn'. Set to
@@ -147,7 +149,7 @@ On the Mac, there is an app called 'Thorium Reader' at: https://www.edrlab.org/s
 
 
 ## DRM-free Books
-DRM (Digital rights management) is a set of technical controls (mostly encryption) added to books to supposedly prevent unauthorized use or distribution. My sense is that author's themselves don't care much about it, and it is used to lock you into a single book-reading platform more than anything else. For obvious reasons, storyalign only works on DRM-free books. Many books can be purchased DRM-free from various platforms like ebookshop.org, libro.fm, and kobo. For books you already own, there is software at epubor.com that can be used for DRM removal. 
+DRM (Digital rights management) is a set of technical controls (mostly encryption) added to books to supposedly prevent unauthorized use or distribution. My sense is that author's themselves don't care much about it, and it is used to lock you into a single book-reading platform more than anything else. For obvious reasons, storyalign only works on DRM-free books. Many books can be purchased DRM-free from various platforms like ebookshop.org, libro.fm, and kobo. 
 
 
 ## Support Tools
