@@ -20,6 +20,9 @@ fileprivate let s_skipSet:Set<Character> = ["(", "[", "{",
                                             "—"    // em-dash
 ]
 
+fileprivate let s_skipTags:Set<String> = HTMLTags.inline.filter { $0 != "span" }
+
+
 extension Node {
     private var inlineTags: Set<String> {
         HTMLTags.inline
@@ -151,7 +154,7 @@ extension Node {
             var sawText = false
             var skipLeadingSpaceNext = false
 
-            for c in children {
+            try children.pairs().forEach { (prev, c) in
                 if let tn = c as? TextNode {
                     let raw = tn.getWholeText()
                     let normalized = try Entities.unescape(raw)
@@ -163,12 +166,15 @@ extension Node {
                     }
                     skipLeadingSpaceNext = false
                     sawText = true
-                    continue
+                    return
                 }
                 if let elc = c as? Element {
                     if sawText && !body.isEmpty {
                         if !body.last!.isWhitespace && !s_skipSet.contains(body.last!) {
-                            body += " "
+                            let tag = prev?.nodeName() ?? ""
+                            if !s_skipTags.contains(tag) {
+                                body += " "
+                            }
                         }
                     }
                     body += try elc.xmlFormatted(indentLevel: 0)

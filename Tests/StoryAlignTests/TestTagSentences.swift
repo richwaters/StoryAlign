@@ -1126,6 +1126,85 @@ class TagSentencesTests: XCTestCase {
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
     }
+    
+    func testTagInWordSpanBold() throws {
+        let xml = """
+            <div class="tx1"><b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.1">K</span></b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">asia took the pitcher of beer, only slightly watered because the four merchants at the large table were regular patrons, and headed back from the kitchen toward the common room.</span></div>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <div class="tx1">
+                  <span id="chapter_one-sentence0"><b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.1">K</span></b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">asia took the pitcher of beer, only slightly watered because the four merchants at the large table were regular patrons, and headed back from the kitchen toward the common room.</span></span>
+                </div>
+              </body>
+            </html>
+            """
+        
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+    
+    func testSpaceBetween3() throws {
+        let xml = """
+            <hgroup>
+              <h2>
+                <span epub:type="label">Part</span> 
+                <span epub:type="ordinal z3998:roman">II</span>
+              </h2>
+              <p epub:type="title">Other Worlds</p>
+            </hgroup>
+        """
+        
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <hgroup>
+                  <h2>
+                    <span id="chapter_one-sentence0"><span epub:type="label">Part</span> <span epub:type="ordinal z3998:roman">II</span></span>
+                  </h2>
+                  <p epub:type="title">
+                    <span id="chapter_one-sentence1">Other Worlds</span>
+                  </p>
+                </hgroup>
+              </body>
+            </html>
+            """
+        
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+    
+    func testWhitespace4() throws {
+        let xml = """
+            <span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.4">They were paying him a peppercorn retainer and keeping his access accounts live, with a view to ultimately publishing </span><i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">Forked Tongues: The SocioPsychoLinguistics of the Ariekei</span></i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">.</span></p>
+            """
+        
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.4">They were paying him a peppercorn retainer and keeping his access accounts live, with a view to ultimately publishing </span> <i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">Forked Tongues: The SocioPsychoLinguistics of the Ariekei</span></i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">.</span></span>
+                <p/>
+              </body>
+            </html>
+            """
+        
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+        
 }
 
 
