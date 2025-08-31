@@ -35,7 +35,7 @@ struct StoryAlignHelp {
     Arguments:
       <ebook>         The input ebook file (in .epub format)
 
-      <audio book>    The input audiobook file (in .m4b format).
+      <audiobook>    The input audiobook file (in .m4b format).
     """
     
     // The | at the end here is the ~76th column. Don't go past it         |
@@ -57,17 +57,19 @@ struct StoryAlignHelp {
           Suppress progress updates. 
     
       --throttle
-          By default, \(toolName) will use all of the resources the the 
+          By default, \(toolName) will use all of the resources the 
           operating system allows. That can end up working the 
-          device pretty hard. Use this option to pair back on that. Aligning
+          device pretty hard. Use this option to pare back on that. Aligning
           the book will take longer, but it'll keep the fans off.
 
       --whisper-model <file>
           The whisper model file. This is a 'ggml' file compatible with 
-          the whisper.cpp library. The 'ggml-tiny.bin' model is appropriate
+          the whisper.cpp library. The 'ggml-tiny.en.bin' model is appropriate
           and best for most cases. If this option is not specified, 
           \(toolName) will download and install the model after prompting for 
-          confirmation.
+          confirmation. If you do specify a model file, make sure the companion
+          .mlmodelc files are installed in the same location as the specified 
+          .bin file.
 
       --audio-loader=\(orAudioLoader)
           Selects the audio-loading engine. The default is 'avfoundation', 
@@ -97,7 +99,7 @@ struct StoryAlignHelp {
           The default is 'none'.
     
       --whisper-beam-size <number (1-8)>
-          Set the number of paths explored by whisper.cpp when looking for the
+          Set the number of paths explored by whisper.cpp when looking for
           the best transcription. Higher values will consider more options. That
           doesn't necessarily mean more accuracy. In fact, it's a bit 
           arbitrary. (Lookup 'beam search curse' to learn more). \(toolName)
@@ -105,8 +107,8 @@ struct StoryAlignHelp {
           all other models.  
     
      --whisper-dtw
-          Enable dynamic type warping experimantal feature for whisper.cpp and
-          the experimental handling of what information in \(toolName). This
+          Enable the dynamic time warping experimantal feature for whisper.cpp
+          and the experimental handling of that information in \(toolName). This
           might improve accuracy of the timing of the transcription. 
           
       --session-dir <directory>

@@ -1,5 +1,7 @@
 # storyalign
-storyalign is a macOS command line tool that combines an epub book with an audiobook to produce an enriched epub  containing synchronized narration.
+storyalign is a macOS command-line tool that combines an ebook with an audiobook to produce an enriched ebook containing audio narration. These enriched ebooks are sometimes called *read-aloud books*, *synchronized audio-ebooks*, *enriched epubs*, and more.
+
+These enhanced books are ideal for people who like to switch between reading and listening, as a single app is used to both read and listen. This keeps your place within the book, regardless of the current reading/listening mode. 
 
 storyalign is based on the storyteller-platform project available here: https://gitlab.com/storyteller-platform/storyteller. It extracts the core alignment functionality from that project into a standalone tool with minimal dependencies.
 
@@ -42,7 +44,7 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
 ### Arguments:
   \<ebook\>        The input ebook file (in .epub format)
 
-  \<audio book\>    The input audiobook file (in .m4b format).
+  \<audiobook\>    The input audiobook file (in .m4b format).
 
 ### Options:
 
@@ -57,22 +59,22 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
       and best for most cases. If this option is not specified,
       storyalign will download and install the model after prompting for
       confirmation. If you do specify a model file, make sure the companion
-      .mlmodelc files are installed the same location as the specified .bin
+      .mlmodelc files are installed in the same location as the specified .bin
       file.
 
 **--log-level**=(debug|info|timestamp|warn|error)
       Set the level of logging output. Defaults to 'warn'. Set to
       'error' to only report errors. If set to anything above 'warn',
-      either redirect stderr (where these messages are sent) or user
+      either redirect stderr (where these messages are sent) or use
       the --no-progress flag to prevent conflicts.
 
 **--no-progress**
       Suppress progress updates.
 
 **--throttle**
-      By default, storyalign will use all of the resources the the
+      By default, storyalign will use all of the resources the
       operating system allows. That can end up working the
-      device pretty hard. Use this option to pair back on that. Aligning
+      device pretty hard. Use this option to pare back on that. Aligning
       the book will take longer, but it'll keep the fans off.
 
 **--audio-loader** (avfoundation|ffmpeg)
@@ -103,7 +105,7 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
       The default is 'none'.
 
 **--whisper-beam-size** <number (1-8)>
-      Set the number of paths explored by whisper.cpp when looking for the
+      Set the number of paths explored by whisper.cpp when looking for
       the best transcription. Higher values will consider more options. That
       doesn't necessarily mean more accuracy. In fact, it's a bit
       arbitrary. (Lookup 'beam search curse' to learn more). storyalign
@@ -111,8 +113,8 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
       all other models.
 
 **--whisper-dtw**
-      Enable dynamic type warping experimental feature for whisper.cpp and
-      the experimental handling of what information in storyalign. This
+      Enable the dynamic time warping experimental feature for whisper.cpp and
+      the experimental handling of that information in storyalign. This
       might improve accuracy of the timing of the transcription.
 
 **--session-dir** <directory>
@@ -128,34 +130,34 @@ storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] 
 
 
 ## Models & Transcriptions
-storyalign uses the 'whisper.cpp' for transcription of the audio book. That project can be found at: https://github.com/ggml-org/whisper.cpp. By default, storyalign uses the tiny.en model which it downloads installs under a .storyalign directory in the user's home folder. Other models can be downloaded from https://huggingface.co/ggerganov/whisper.cpp/tree/main. For best results, and to avoid a bunch of warnings, **the companion .mlmodelc.zip file should be downloaded and installed in the same directory as the .bin model**. 
+storyalign uses the 'whisper.cpp' for transcription of the audiobook. That project can be found at: https://github.com/ggml-org/whisper.cpp. By default, storyalign uses the tiny.en model which it downloads and installs under a .storyalign directory in the user's home folder. Other models can be downloaded from https://huggingface.co/ggerganov/whisper.cpp/tree/main. For best results, and to avoid a bunch of warnings, **the companion .mlmodelc.zip file should be downloaded and installed in the same directory as the .bin model**. 
 
-The large-v3-turbo seems to work the best in most cases, but in some cases the larger models can actually work worse. They can get stuck in a punctuation-less mode, and they can also suffer from the 'beam-search-curse'. To be honest, the whole thing seems a bit of a crap-shoot. In the case of storyalign, you can spend a lot of time trying to get things perfect, but ultimately it's only the difference of a fraction of a percent of sentences being misaligned, and that doesn't have much of an affect on the reading/listening experience.
+The large-v3-turbo seems to work the best in most cases, but in some cases the larger models can actually work worse. They can get stuck in a punctuation-less mode, and they can also suffer from the 'beam-search-curse'. To be honest, the whole thing seems a bit of a crapshoot. In the case of storyalign, you can spend a lot of time trying to get things perfect, but ultimately it's only the difference of a fraction of a percent of sentences being misaligned, and that doesn't have much of an effect on the reading/listening experience.
 
 That said, the quality of the narrated epub is mostly dependent on the quality of the transcription so it is important for that part to work.
 
 
 ## Scores & Reports
-The --report option can be used to tell storyalign to produce a report about how well it thinks the alignment worked. This includes a score that is based on the percentage of sentences that it thinks were aligned correctly. This should usually be over 98 or 99%, but it can be less, especially for shorter books. This is due to the fact that some portions of the book like acknowledgement, about the author, etc. might not appear in the audio at all. For smaller books those sections are a larger percentage of the total book, which causes a lower overall score. Proper epubs will have 'bodymatter' and 'backmatter' attributes that point to the actual content of the book, but use of 'backmatter' is still spotty.
+The --report option can be used to tell storyalign to produce a report about how well it thinks the alignment worked. This includes a score that is based on the percentage of sentences that it thinks were aligned correctly. This should usually be over 98 or 99%, but it can be less, especially for shorter books. This is due to the fact that some portions of the book like acknowledgements, about the author, etc. might not appear in the audio at all. For smaller books those sections are a larger percentage of the total book, which causes a lower overall score. Proper epubs will have 'bodymatter' and 'backmatter' attributes that point to the actual content of the book, but use of 'backmatter' is still spotty.
 
 The storyalign reporting uses various mechanisms to determine if a sentence might be misaligned, but the main surefire indicator is if a sentence is too fast. That said, the current version of the reports still produces a lot of false positives. 
 
 
 
 ## Epub Readers
-There are two iOS epub readers I know of that support the narrated epubs created by storyalign are the 'Storyteller reader' from https://apps.apple.com/us/app/storyteller-reader/id6474467720 and 'BookFusion' from https://apps.apple.com/us/app/bookfusion/id1141834096.  As storyalign is derived from storyteller-platform, you are highly encouraged to download that app and support that project as much as possible.
+Two iOS epub readers that support the narrated epubs created by storyalign are *Storyteller Reader* from https://apps.apple.com/us/app/storyteller-reader/id6474467720 and *BookFusion* from https://apps.apple.com/us/app/bookfusion/id1141834096.  As storyalign is derived from storyteller-platform, you are highly encouraged to download that app and support that project as much as possible.
 
-On the Mac, there is an app called 'Thorium Reader' at: https://www.edrlab.org/software/thorium-reader/. I don't do much ebook reading on my Mac, but this app's search functionality has been incredibly useful in investigating misalignments reported in storyalign's reports.
+On macOS, there is an app called 'Thorium Reader' at: https://www.edrlab.org/software/thorium-reader/. I don't do much ebook reading on my Mac, but this app's search functionality has been incredibly useful in investigating misalignments reported in storyalign's reports.
 
 
 ## DRM-free Books
-DRM (Digital rights management) is a set of technical controls (mostly encryption) added to books to supposedly prevent unauthorized use or distribution. My sense is that author's themselves don't care much about it, and it is used to lock you into a single book-reading platform more than anything else. For obvious reasons, storyalign only works on DRM-free books. Many books can be purchased DRM-free from various platforms like ebookshop.org, libro.fm, and kobo. 
+DRM (Digital rights management) is a set of technical controls (mostly encryption) added to books to supposedly prevent unauthorized use or distribution. My sense is that authors themselves don't care much about it, and it is used to lock you into a single book-reading platform more than anything else. For obvious reasons, storyalign only works on DRM-free books. Many books can be purchased DRM-free from various platforms like ebookshop.org, libro.fm, and kobo. 
 
 
 ## Support Tools
 
 ### smilcheck
-smilcheck is a tool that can be useful for checking the epub-3 media overlays used by these narrated books. It's a work-in-progress, as I decided to focus more on the reporting within storyalign instead of continuing to improve smilcheck. Still, smilcheck is a useful external tool, as it can be run on any read-aloud epub, not just those created by storyalign. It works in a similar fashion to storyalign's reporting in that it examines the pacing of sentences to find misalignments. It differs in that it only uses the information in the final enhanced epub to make it's determinations.
+smilcheck is a tool that can be useful for checking the epub-3 media overlays used by these narrated books. It's a work-in-progress, as I decided to focus more on the reporting within storyalign instead of continuing to improve smilcheck. Still, smilcheck is a useful external tool, as it can be run on any read-aloud epub, not just those created by storyalign. It works in a similar fashion to storyalign's reporting in that it examines the pacing of sentences to find misalignments. It differs in that it only uses the information in the final enhanced epub to make its determinations.
 
 Usage is simply: smilcheck \<epub file\>
 
@@ -163,7 +165,7 @@ smilcheck should generally be run after confirming the book passes the checks in
 
 
 ### epubdiff.sh
-This is a tool that performs a diff on 2 epubs. It doesn't do the diff itself, as it relies on an external tool (set by DIFFTOOL) at the top of the script for that. It just unzips the epubs into temporary directories and calls the difftool to perform the diff.
+This is a tool that performs a diff on two epubs. It doesn't do the diff itself, as it relies on an external tool (set by DIFFTOOL) at the top of the script for that. It just unzips the epubs into temporary directories and calls the difftool to perform the diff.
 
 Usage is: epubdiff.sh \<epub file 1\> \<epub file 2\>
 
@@ -175,13 +177,13 @@ Usage is: epubstrip.sh \<epub file\>
 
 
 ### mkExpected.sh
-This tool is used to make the expected result files for the full book tests. When complete, it outputs the checksum of the stripped content which can then be manually entered into the testinfo.json file. 
+This tool is used to make the expected result files for the full book tests. When run, it outputs the checksum of the stripped content which can then be manually entered into the testinfo.json file. 
 
 Usage is: mkExpected.sh \<book name (no extension)\>
 
 
 ### generate_schemes_for_book.sh
-It's helpful to debug the tool by running the different stages. To accomplish that, an Xcode scheme is used for each separate run stage. The generate_schemes_for_book.sh tool is used to generate the schemes from a template. This is a lot easier than using the Xcode scheme editor to add arguments, environment, etc. for each scheme. Basically, you can set all of the arguments for all of the schemes with a simple command. The basename of the epub file and the audio file must match for this script to work.
+It's helpful to debug the tool by running the different stages. To accomplish that, an Xcode scheme is used for each separate run stage. The generate_schemes_for_book.sh tool is used to generate the schemes from a template. This is a lot easier than using the Xcode scheme editor to add arguments, environment, etc. for each scheme. Basically, you can set all of the arguments for all of the schemes with a simple command. The basename of the epub file and the audio file must match for the script to work.
 
 Usage is: generate_schemes_for_book.sh <options> <epub file>
 

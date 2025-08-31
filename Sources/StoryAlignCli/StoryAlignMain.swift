@@ -117,19 +117,19 @@ extension StoryAlignMain {
         if (cli.positionals ?? []).count != 2 {
             if let firstArg = cli.positionals?.first {
                 if firstArg.pathExtension == "epub" {
-                    throw CliError( "Missing audio book argument" )
+                    throw CliError( "Missing audiobook argument" )
                 }
                 else if audioExtensions.contains(firstArg.pathExtension) {
                     throw CliError( "Missing ebook argument" )
                 }
             }
-            throw CliError( "Both ebook and audio book must be specified on command line" )
+            throw CliError( "Both ebook and audiobook must be specified on command line" )
         }
         if cli.ebook.pathExtension != "epub" {
             throw CliError( "Both ebooks in epub format with .epub extension allowed" )
         }
         if !audioExtensions.contains(cli.audioBook.pathExtension ) {
-            throw CliError( "Only audio books with the following extensions are allowed: \(audioExtensions.joined(separator: ", "))")
+            throw CliError( "Only audiobooks with the following extensions are allowed: \(audioExtensions.joined(separator: ", "))")
         }
         
         let fileMgr = FileManager.default
