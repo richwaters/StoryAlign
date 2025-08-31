@@ -9,8 +9,14 @@ import XCTest
 
 class TestExtras: XCTestCase, FullBookTester {
     let testBookDir = "\(SRCROOT)/Tests/TestBooks/extras"
+    
+    override func setUp() async throws {
+        try await super.setUp()
+        if !FileManager.default.fileExists(atPath: testBookDir) {
+            throw XCTSkip("TestBooks/extras folder not found")
+        }
+    }
 }
-
 
 extension TestExtras {
     func testDrive() async throws {

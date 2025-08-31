@@ -22,6 +22,7 @@ struct TestBookInfo : Codable {
     let audioBookSource:String?
     let epubURL:URL?
     let epubSource:String?
+    let epubSha256:String?
     
     let testConfigs:[TestConfig]
 }
@@ -84,14 +85,18 @@ extension FullBookTester {
             }
         }
         if !fm.fileExists(atPath: epubPath.path()) {
-            print( "No epub for \(bookName): skipping test" , separator: "")
+            var msg = "No epub for \(bookName)"
             if let epubSource = testInfo.epubSource {
-                print( " -- Download from \(epubSource)")
+                msg += " -- Download from \(epubSource)"
             }
-            else {
-                print("")
+            throw XCTSkip(msg)
+        }
+        
+        if let epubSha256 = testInfo.epubSha256 {
+            let calculatedSha256 = try runEpubStrip(epubPath)
+            if calculatedSha256 != epubSha256 {
+                throw XCTSkip("Epub SHA256 mismatch for \(bookName)")
             }
-            return
         }
         
         let audioPath = URL(fileURLWithPath: "\(testBookDir)/\(bookName)/\(bookName).m4b")
@@ -103,14 +108,11 @@ extension FullBookTester {
             }
         }
         if !fm.fileExists(atPath: audioPath.path()) {
-            print( "No audiobook for \(bookName): skipping test" , separator: "")
+            var msg = "No audiobook for \(bookName)"
             if let audioSource = testInfo.audioBookSource {
-                print( " -- Download from \(audioSource)")
+                msg += " -- Download from \(audioSource)"
             }
-            else {
-                print("")
-            }
-            return
+            throw XCTSkip(msg)
         }
         
         let outPath:URL = sessionConfig.sessionDir.appendingPathComponent("\(bookName)\(sfx).epub")
@@ -138,7 +140,7 @@ extension FullBookTester {
     func runEpubStrip(_ file:URL) throws -> String  {
         let stripScriptPath = "\(Self.SRCROOT)/scripts/epubstrip.sh"
         let sum = try runScript(stripScriptPath, args: [file.path()])
-        return sum
+        return sum.trimmed()
     }
     
     func runEpubCheck(_ file:URL) throws  {
