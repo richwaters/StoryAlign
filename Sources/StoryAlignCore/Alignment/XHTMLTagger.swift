@@ -502,7 +502,6 @@ extension XHTMLTagger {
             guard !seen.contains(id) else { continue }
             seen.insert(id)
 
-            // make a fresh “merged” span with the same attributes
             let merged = Element(Tag("span"), "")
             for attr in (group[0].getAttributes() ?? Attributes()).asList() {
                 try merged.attr(attr.getKey(), attr.getValue())
@@ -514,18 +513,15 @@ extension XHTMLTagger {
             
             try firstSentence.before(merged)
             
-            // for each of the original spanners:
             for chapSpan in sentenceSpans {
                 // lift out its inner text/nodes from the little
                 if let innerSpan = try chapSpan.select("span[id=\(id)]").first() {
                     let children = innerSpan.getChildNodes()
                     for child in children {
-                        try child.remove()      // detach it
-                        try chapSpan.appendChild(child) // move it back into the chapter span
+                        try innerSpan.before(child)
                     }
                     try innerSpan.remove()
                 }
-                // move the entire chapter-span under our new merged span
                 try merged.appendChild(chapSpan)
             }
         }

@@ -20,6 +20,8 @@ fileprivate let s_skipSet:Set<Character> = ["(", "[", "{",
                                             "—"    // em-dash
 ]
 
+fileprivate let s_doubleQuotes = [ "\"","“" ]
+
 fileprivate let s_skipTags:Set<String> = HTMLTags.inline.filter { $0 != "span" }
 
 
@@ -169,11 +171,14 @@ extension Node {
                     return
                 }
                 if let elc = c as? Element {
-                    if sawText && !body.isEmpty {
+                    if sawText && !body.isEmpty && !elc.isEmpty() {
                         if !body.last!.isWhitespace && !s_skipSet.contains(body.last!) {
                             let tag = prev?.nodeName() ?? ""
                             if !s_skipTags.contains(tag) {
-                                body += " "
+                                let prevText = try (prev as? Element)?.text() ?? ""
+                                if prevText.count != 1 || !s_doubleQuotes.contains(prevText) {
+                                    body += " "
+                                }
                             }
                         }
                     }
