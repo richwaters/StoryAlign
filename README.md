@@ -39,7 +39,7 @@ location in your PATH or run it in place.
 
 ## Usage
 
-storyalign [--help] [--version] [--outfile=\<file\>] [--whisper-model=\<file\>] [--log-level=(debug|info|timestamp|warn|error)] [--no-progress] [--throttle]  [--audio-loader=(avfoundation|ffmpeg)] [--report=(none|score|stats|full|json)] [--whisper-beam-size=\<number\>] [--whisper-dtw] [--session-dir=\<directory\>] [--stage=(epub|audio|transcribe|align|xml|export|report|all)] \<ebook\> \<audiobook\>
+storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<file\>\] \[--log-level=(debug|info|timestamp|warn|error)\] \[--no-progress\] \[--throttle\]  \[--audio-loader=(avfoundation|ffmpeg)\] \[--report=(none|score|stats|full|json)\] \[--whisper-beam-size=\<number\>\] \[--whisper-dtw\] \[--session-dir=\<directory\>\] \[--stage=(epub|audio|transcribe|align|xml|export|report|all)\] \<ebook\> \<audiobook\>
 
 ### Arguments:
   \<ebook\>        The input ebook file (in .epub format)
@@ -171,9 +171,9 @@ Usage is: epubdiff.sh \<epub file 1\> \<epub file 2\>
 
 
 ### epubstrip.sh
-epubstrip.sh slims down a narrated epub by removing the audio and some of the meta information that contains dates and times. It outputs a checksum of the content of the epub when it completes. This checksum is then used by the full book tests to ensure that code modifications don't cause unintended changes to the produced book.
+epubstrip.sh slims down a narrated epub by removing the audio and some of metadata (such as dates and times). It outputs a checksum of the content of the epub when it completes. This checksum is then used by the full book tests to ensure that code modifications don't cause unintended changes to the produced book. The *--sum-only* option can be used to output just the checksum without producing the stripped file.
 
-Usage is: epubstrip.sh \<epub file\>
+Usage is: epubstrip.sh \[--sum-only\] \<epub file\> \[\<output file\>\]
 
 
 ### mkExpected.sh
@@ -185,7 +185,7 @@ Usage is: mkExpected.sh \<book name (no extension)\>
 ### generate_schemes_for_book.sh
 It's helpful to debug the tool by running the different stages. To accomplish that, an Xcode scheme is used for each separate run stage. The generate_schemes_for_book.sh tool is used to generate the schemes from a template. This is a lot easier than using the Xcode scheme editor to add arguments, environment, etc. for each scheme. Basically, you can set all of the arguments for all of the schemes with a simple command. The basename of the epub file and the audio file must match for the script to work.
 
-Usage is: generate_schemes_for_book.sh <options> <epub file>
+Usage is: generate_schemes_for_book.sh \<options\> \<epub file\>
 
 
 
