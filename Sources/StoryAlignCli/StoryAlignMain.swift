@@ -148,6 +148,9 @@ extension StoryAlignMain {
             try? fm.removeItem(at: cli.outputURL)
         }
         
+        try "test".write(toFile: cli.outputURL.path(), atomically: true, encoding: .utf8)
+        try fm.removeItem(at: cli.outputURL)
+        
         if cli.runStage != nil {
             if cli.sessionDir == nil {
                 throw CliError("--stages was set, but --session-dir was not provided. A --session-dir is required to persist intermediate data between runs of specific stages.")
