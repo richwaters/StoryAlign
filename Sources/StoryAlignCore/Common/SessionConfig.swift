@@ -95,5 +95,6 @@ public final class SessionConfig : Sendable {
         if !shouldRemoveSessionDir {
             return
         }
+        try? FileManager.default.removeItem(at: sessionDir)
     }
 }
