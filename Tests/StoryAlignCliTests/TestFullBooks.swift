@@ -93,7 +93,7 @@ extension FullBookTester {
         }
         
         if let epubSha256 = testInfo.epubSha256 {
-            let calculatedSha256 = try runEpubStrip(epubPath)
+            let calculatedSha256 = try runEpubStrip(epubPath,checksumOnly: true)
             if calculatedSha256 != epubSha256 {
                 throw XCTSkip("Epub SHA256 mismatch for \(bookName)")
             }
@@ -126,20 +126,34 @@ extension FullBookTester {
         try runEpubCheck(outPath)
         
         let ckSum = try runEpubStrip(outPath)
-        XCTAssert(ckSum.trimmed() == testConfig.expectedSha256.trimmed())
+        guard ckSum.trimmed() == testConfig.expectedSha256.trimmed() else {
+            XCTFail( "Checksum mismatch for \(bookName)" )
+            return
+        }
 
         let score = rpt.score
         let expectedScore = expectedRpt.score
-        XCTAssert(score == expectedScore )
+        
+        guard score == expectedScore else {
+            XCTFail("Score mismatch for \(bookName): \(score) != \(expectedScore)")
+            return
+        }
         
         let runtime = rpt.runtime
         let expectedRunTime = expectedRpt.runtime
-        XCTAssert( runtime < (expectedRunTime * 2) )
+         
+        guard runtime < (expectedRunTime * 2) else {
+            XCTFail("Align \(bookName) too slow: \(runtime), Expected \(expectedRunTime)")
+            return
+        }
+        
+        sessionConfig.cleanup()
     }
     
-    func runEpubStrip(_ file:URL) throws -> String  {
+    func runEpubStrip(_ file:URL, checksumOnly:Bool=false) throws -> String  {
         let stripScriptPath = "\(Self.SRCROOT)/scripts/epubstrip.sh"
-        let sum = try runScript(stripScriptPath, args: [file.path()])
+        let args = (checksumOnly ? ["--sum-only"] : []) + [file.path(), file.path()+".stripped"]
+        let sum = try runScript(stripScriptPath, args: args)
         return sum.trimmed()
     }
     

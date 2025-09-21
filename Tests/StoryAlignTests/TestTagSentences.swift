@@ -385,7 +385,7 @@ class TagSentencesTests: XCTestCase {
               </head>
               <body>
                 <p>
-                    <span id="chapter_one-sentence0">Call me Ishmael.</span> <span id="chapter_one-sentence1">Some <img src="#"></img>years ago—never mind how long precisely—having
+                    <span id="chapter_one-sentence0">Call me Ishmael.</span> <span id="chapter_one-sentence1">Some<img src="#"></img> years ago—never mind how long precisely—having
                     little or no money in my purse, and nothing particular to interest me on
                     shore, I thought I would sail about a little and see the watery part of
                     the world.</span>
@@ -1204,7 +1204,85 @@ class TagSentencesTests: XCTestCase {
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
     }
-        
+    
+    func testWhitespace5() throws {
+        let xml = """
+            <div class="tx1"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.1">“</span><b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">J</span></b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">ad boil the bastard in his own fish sauce!” </span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.2">Rasic snarled under his breath as he scrubbed at a stained pot. </span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.3">“We might as well have joined the Sleepless Ones and gotten some holy credit for being up all fucking night!”</span></div>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <div class="tx1">
+                  <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.1">“</span><b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">J</span></b><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">ad boil the bastard in his own fish sauce!” </span></span>
+                  <span id="chapter_one-sentence1"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.2">Rasic snarled under his breath as he scrubbed at a stained pot. </span></span>
+                  <span id="chapter_one-sentence2"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.3">“We might as well have joined the Sleepless Ones and gotten some holy credit for being up all fucking night!”</span></span>
+                </div>
+              </body>
+            </html>
+            """
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+    
+    
+    func testMergeDup2() throws {
+        let xml = """
+            <div class="fmtx"><span id="kobo.85.1" class="calibre3">An unpleasantness was a cart rumbling through the street below one’s bedroom too early in the morning.</span><span id="kobo.85.2" class="calibre3"> It was water in one’s boots on winter roads, a chest cough on a cold day, a bitter wind finding a chink in walls; it was sour wine, stringy meat, a tedious sermon in chapel, a ceremony running long in summer heat.</span></div>
+            <div class="fmtx"><span id="kobo.86.1" class="calibre3">Unpleasantness was not the plague and burying children, it was not Sarantine Fire, not the Day of the Dead, or the <i class="calibre7">zubir</i> of the Aldwood appearing out of fog with blood dripping from its horns, it was not .</span><span id="kobo.86.2" class="calibre3"> .</span><span id="kobo.86.3" class="calibre3"> .</span><span id="kobo.86.4" class="calibre3"> this.</span><span id="kobo.86.5" class="calibre3"> It was not this.</span></div>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <div class="fmtx">
+                  <span id="chapter_one-sentence0"><span id="kobo.85.1" class="calibre3">An unpleasantness was a cart rumbling through the street below one’s bedroom too early in the morning.</span></span>
+                  <span id="chapter_one-sentence1"><span id="kobo.85.2" class="calibre3">It was water in one’s boots on winter roads, a chest cough on a cold day, a bitter wind finding a chink in walls; it was sour wine, stringy meat, a tedious sermon in chapel, a ceremony running long in summer heat.</span></span>
+                </div>
+                <div class="fmtx">
+                  <span id="kobo.86.1" class="calibre3"><span id="chapter_one-sentence2">Unpleasantness was not the plague and burying children, it was not Sarantine Fire, not the Day of the Dead, or the <i class="calibre7">zubir</i> of the Aldwood appearing out of fog with blood dripping from its horns, it was not . <span id="kobo.86.2" class="calibre3"> .</span> <span id="kobo.86.3" class="calibre3"> .</span> <span id="kobo.86.4" class="calibre3"> this.</span></span></span>
+                  <span id="chapter_one-sentence3"><span id="kobo.86.5" class="calibre3">It was not this.</span></span>
+                </div>
+              </body>
+            </html>
+            """
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+    
+    
+    func testEmptySpan() throws {
+        let xml = """
+                <p class="TX">He spread his hands. &#x201C;I told you, Marty. The status quo is rot<span role="doc-pagebreak" epub:type="pagebreak" id="pg_139" aria-label=" Page 139. "/>ten, but it&#x2019;s our kind of rotten. We don&#x2019;t want you to die&#x2014;our job is to protect you. But we&#x2019;re also protecting all the other people who will be collateral damage if you <i>don&#x2019;t</i> die. We have substantial resources&#x2014;the civil asset forfeiture program means that any time we run short on funds, we just seize one of the many bank accounts we&#x2019;re keeping tabs on. We can afford this, and it solves everyone&#x2019;s problems.&#x201D;</p>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <p class="TX">
+                  <span id="chapter_one-sentence0">He spread his hands. </span>
+                  <span id="chapter_one-sentence1">“I told you, Marty. </span>
+                  <span id="chapter_one-sentence2">The status quo is rot<span role="doc-pagebreak" epub:type="pagebreak" id="pg_139" aria-label=" Page 139. "/>ten, but it’s our kind of rotten. </span>
+                  <span id="chapter_one-sentence3">We don’t want you to die—our job is to protect you. </span>
+                  <span id="chapter_one-sentence4">But we’re also protecting all the other people who will be collateral damage if you <i>don’t</i> die. </span>
+                  <span id="chapter_one-sentence5">We have substantial resources—the civil asset forfeiture program means that any time we run short on funds, we just seize one of the many bank accounts we’re keeping tabs on. </span>
+                  <span id="chapter_one-sentence6">We can afford this, and it solves everyone’s problems.”</span>
+                </p>
+              </body>
+            </html>
+            """
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
 }
 
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
-#set -x
+set -x
 
 DIFFTOOL="jbdiff.sh"
-#DIFFTOOL="sbdiff.sh"
+#DIFFTOOL="bcomp"
 
 EPUB1="$1"
 EPUB2="$2"
