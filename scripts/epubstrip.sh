@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
-set -e
-#set -x 
+#set -x
 
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
-  echo "Usage: $0 <file>"
+  echo "Usage: $0 [--sum-only] <input file> [<outfile>]"
   exit 1
+fi
+
+sum_only=false
+if [ "${1:-}" = "--sum-only" ]; then
+  sum_only=true
+  shift
 fi
 
 infile="$1"
 basename="${infile##*/}" 
 outfile="${basename}.stripped"
-#outfile="${infile%.epub}_stripped.cpio.gz"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
@@ -36,12 +40,18 @@ raw=`find . -type f -print0 | sort -f -z | xargs -0 cat | sha256sum`
 sum=${raw%% *}
 echo ${sum}
 
-zip --quiet -X0 "$tmp/${outfile}" mimetype
-zip --quiet -Xr9 "$tmp/${outfile}" * -x mimetype
+if [ "$sum_only" = false ]; then
+    zip --quiet -X0 "$tmp/${outfile}" mimetype
+    zip --quiet -Xr9 "$tmp/${outfile}" * -x mimetype
+    popd > /dev/null
 
-
-popd > /dev/null
-mv ${tmp}/${outfile} .
+    if [ -z "${2:-}" ]; then 
+      mv ${tmp}/${outfile} .
+    else 
+      mv ${tmp}/${outfile} $2
+    fi
+fi
+rm -rf $tmp
 
 exit 0
 
