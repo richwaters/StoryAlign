@@ -86,27 +86,33 @@ extension AvAudioLoader {
         let outFrames = max( inBuf.frameCapacity, AVAudioFrameCount(Double(inBuf.frameLength) * ratio))
         let outBuf    = AVAudioPCMBuffer(pcmFormat: outFmt, frameCapacity: outFrames)!
         
-        var inputFramePosition: AVAudioFramePosition = 0
+        final class InputState: @unchecked Sendable {
+            let fmt: AVAudioFormat
+            let channels: [UnsafePointer<Float>]
+            var pos: AVAudioFramePosition = 0
+            init(fmt: AVAudioFormat, buf: AVAudioPCMBuffer) {
+                self.fmt = fmt
+                let fcd = buf.floatChannelData!
+                let n = Int(fmt.channelCount)
+                self.channels = (0..<n).map { UnsafePointer(fcd[$0]) }
+            }
+        }
+
+        let state = InputState(fmt: inFmt, buf: inBuf)
         let totalInputFrames = AVAudioFramePosition(inBuf.frameLength)
-        
-        let inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus in
-            let framesLeft = totalInputFrames - inputFramePosition
-            guard framesLeft > 0 else {
-                outStatus.pointee = .endOfStream
-                return nil
-            }
-            
-            let packetsToCopy = min(AVAudioFrameCount(framesLeft), inNumPackets)
-            let chunk = AVAudioPCMBuffer(pcmFormat: inFmt, frameCapacity: packetsToCopy)!
-            chunk.frameLength = packetsToCopy
 
-            for ch in 0..<Int(inFmt.channelCount) {
-                let src = inBuf.floatChannelData![ch] + Int(inputFramePosition)
+        let inputBlock:AVAudioConverterInputBlock = { inNumPackets, outStatus in
+            let framesLeft = totalInputFrames - state.pos
+            guard framesLeft > 0 else { outStatus.pointee = .endOfStream; return nil }
+            let n = min(AVAudioFrameCount(framesLeft), inNumPackets)
+            let chunk = AVAudioPCMBuffer(pcmFormat: state.fmt, frameCapacity: n)!
+            chunk.frameLength = n
+            for ch in 0..<state.channels.count {
+                let src = state.channels[ch].advanced(by: Int(state.pos))
                 let dst = chunk.floatChannelData![ch]
-                dst.update(from: src, count: Int(packetsToCopy))
+                dst.update(from: src, count: Int(n))
             }
-
-            inputFramePosition += AVAudioFramePosition(packetsToCopy)
+            state.pos &+= AVAudioFramePosition(n)
             outStatus.pointee = .haveData
             return chunk
         }
