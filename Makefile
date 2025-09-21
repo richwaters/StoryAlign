@@ -23,4 +23,6 @@ release:
 	./scripts/update_storyalign_version.sh "$(VERSION)"
 	make test
 	make install
+	cd bin && zip storyalign-macos-arm64.zip storyalign
+
 
