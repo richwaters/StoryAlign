@@ -1,11 +1,11 @@
 {
-  "audioBookSource" : "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook",
-  "epubSource" : "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook - for Kobo version",
-  "epubSha256" : "214a547e1f1a0efb418d70d9ad942fcd4db34858f6fa40b616f5c1dec01bcdca",
+  "audioBookSource": "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook",
+  "epubSource": "https://www.dragonsteelbooks.com/products/dragonsteel-prime-ebook - for Kobo version",
+  "epubSha256": "214a547e1f1a0efb418d70d9ad942fcd4db34858f6fa40b616f5c1dec01bcdca",
   "testConfigs": [
     {
       "modelName": "ggml-tiny.en.bin",
-      "expectedSha256": "2c13f75a7363fdc7f84925cc6419e66bf7f95552cd068e367210a7f78012122d"
+      "expectedSha256": "1b692f785639f1b92164853c07c9282cfdb72c29c429aa54048db93f2d06ef88"
     }
   ]
 }

@@ -53,7 +53,8 @@ extension FullBookTester {
         let progressUpdater = CliProgressUpdater()
         
         let sessionDir:String? = nil
-        let sessionConfig = try SessionConfig(sessionDir: sessionDir, modelFile: model, runStage: nil, logger:logger, progressUpdater: progressUpdater, reportType: .full)
+        let audioLoaderType:AudioLoaderType = .avfoundation
+        let sessionConfig = try SessionConfig(sessionDir: sessionDir, modelFile: model, runStage: nil, logger:logger, audioLoaderType: audioLoaderType, progressUpdater: progressUpdater, reportType: .full)
         return sessionConfig
     }
     

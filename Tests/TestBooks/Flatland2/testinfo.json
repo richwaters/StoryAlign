@@ -1,11 +1,11 @@
 {
   "audioBookURL": "https://archive.org/download/flatland_version_2_1901_librivox/Flatland2_librivox.m4b",
   "epubURL": "https://standardebooks.org/ebooks/edwin-a-abbott/flatland/downloads/edwin-a-abbott_flatland_advanced.epub?source=download",
-  "epubSha256" : "46faa21552638820054ebaa0e499d3fb19d83b9a0078a5b1f7f72e933129e1bb",
+  "epubSha256": "46faa21552638820054ebaa0e499d3fb19d83b9a0078a5b1f7f72e933129e1bb",
   "testConfigs": [
     {
       "modelName": "ggml-tiny.en.bin",
-      "expectedSha256": "977219fa9c184bb7ed98774ea9995453cf044f35f09ea5ef369aad80dd37a06a"
-    },
+      "expectedSha256": "47d0eb5676b7e948937fa996a4b2fc3c3999184efd4bcf121917e10f59e277b6"
+    }
   ]
 }
