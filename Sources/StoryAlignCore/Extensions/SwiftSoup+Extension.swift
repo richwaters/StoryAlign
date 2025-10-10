@@ -10,20 +10,7 @@
 
 import SwiftSoup
 
-fileprivate let s_skipSet:Set<Character> = ["(", "[", "{",
-                                            "\"",  // straight double
-                                            "'",   // straight single
-                                            "“",   // left double curly
-                                            "”",   // right double curly
-                                            "‘",   // left single curly
-                                            "’",   // right single curly
-                                            "—"    // em-dash
-]
-
-fileprivate let s_doubleQuotes = [ "\"","“" ]
-
-fileprivate let s_skipTags:Set<String> = HTMLTags.inline.filter { $0 != "span" }
-
+fileprivate let dataSpaceAfterAttrName = "data-space-after"
 
 extension Node {
     private var inlineTags: Set<String> {
@@ -96,19 +83,8 @@ extension Node {
         }
         let name = el.tagName()
         let lower = name.lowercased()
-
-        //let attrs = (el.getAttributes()?.asList() ?? [])
-        //    .map { "\($0.getKey())=\"\($0.getValue())\"" }
-        //    .joined(separator: " ")
-
-        /*
-        let attrs = try (el.getAttributes()?.asList() ?? []).map {
-            let raw = $0.getValue()
-            let normalized = try Entities.unescape(raw)
-            let escaped = normalized.escapingXMLEntities()
-            return "\($0.getKey())=\"\(escaped)\""
-        }.joined(separator: " ")
-         */
+        
+        
         let attrs = try el.attributesAsNormalizedString()
         
         let openTag = attrs.isEmpty
@@ -172,18 +148,13 @@ extension Node {
                 }
                 if let elc = c as? Element {
                     if sawText && !body.isEmpty && !elc.isEmpty() {
-                        if !body.last!.isWhitespace && !s_skipSet.contains(body.last!) {
-                            let tag = prev?.nodeName() ?? ""
-                            if !s_skipTags.contains(tag) {
-                                let prevText = try (prev as? Element)?.text() ?? ""
-                                if prevText.count != 1 || !s_doubleQuotes.contains(prevText) {
-                                    body += " "
-                                }
+                        if !body.last!.isWhitespace {
+                            if prev?.hasAttr(XHTMLTagger.dataSpaceAfterAttrName) ?? false {
+                                body += " "
                             }
                         }
                     }
                     body += try elc.xmlFormatted(indentLevel: 0)
-                    //sawText = false
                     sawText = true
                 }
             }
@@ -208,11 +179,15 @@ extension Element {
         let attributes = (getAttributes()?.asList() ?? [])
         let shouldSort =  (parent()?.tagName() == "manifest" && !mediaOverlay.isEmpty)
         let sortedAttributes = shouldSort ? try sortAttributes(attributes) : attributes
-        let attrString = try sortedAttributes.map {
+        let attrString = try sortedAttributes.compactMap {
+            let key = $0.getKey()
+            if key == XHTMLTagger.dataSpaceAfterAttrName {
+                return nil
+            }
             let raw = $0.getValue()
             let normalized = try Entities.unescape(raw)
             let escaped = normalized.escapingXMLEntities()
-            return "\($0.getKey())=\"\(escaped)\""
+            return "\(key)=\"\(escaped)\""
         }.joined(separator: " ")
         return attrString
     }

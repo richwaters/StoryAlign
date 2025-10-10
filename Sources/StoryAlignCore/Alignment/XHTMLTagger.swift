@@ -13,8 +13,32 @@ import NaturalLanguage
 
 
 struct XHTMLTagger {
+    static let dataSpaceAfterAttrName = "data-storyalign-space-after"
     
     let blocks = HTMLTags.blocks
+    
+    private func lastLeafElement(in el: Element) -> Element {
+        var cur = el
+        while let last = cur.getChildNodes().last as? Element, !last.getChildNodes().isEmpty {
+            cur = last
+        }
+        return cur
+    }
+    
+    private func markSpaceAfter(in parent: Element) throws {
+        let nodes = parent.getChildNodes()
+        guard !nodes.isEmpty else { return }
+        if let el = nodes.last as? Element {
+            try lastLeafElement(in: el).attr(Self.dataSpaceAfterAttrName, "1")
+            return
+        }
+        if nodes.count >= 2, let prevEl = nodes[nodes.count - 2] as? Element {
+            try lastLeafElement(in: prevEl).attr(Self.dataSpaceAfterAttrName, "1")
+            return
+        }
+        try parent.attr("data-space-after", "1")
+    }
+     
 
     func isXmlTextNode(_ node: Node) -> Bool {
         node is TextNode
@@ -78,7 +102,12 @@ struct XHTMLTagger {
         // Skip pure-whitespace for everything except those cloned leaf elements
         if !isLeafElement {
             if let tn = nodeToAppend as? TextNode {
-                if tn.getWholeText().trimmed().isEmpty { return }
+                if tn.getWholeText().trimmed().isEmpty {
+                    if !tn.getWholeText().isEmpty {
+                        try markSpaceAfter(in: xml)
+                    }
+                    return
+                }
             } else if let el = nodeToAppend as? Element {
                 if try el.text().trimmed().isEmpty { return }
             }
@@ -230,9 +259,13 @@ struct XHTMLTagger {
                 // orphan-copy branch once we're past all sentences
 
                 // drop pure-whitespace
-                if let tn = child as? TextNode,
-                   tn.getWholeText().trimmed().isEmpty {
-                    continue
+                if let tn = child as? TextNode {
+                    if tn.getWholeText().trimmed().isEmpty {
+                        if !tn.getWholeText().isEmpty {
+                            try markSpaceAfter(in: taggedXml)
+                        }
+                        continue
+                    }
                 }
 
                 let orphan: Node

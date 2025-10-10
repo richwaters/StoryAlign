@@ -1193,7 +1193,7 @@ class TagSentencesTests: XCTestCase {
             <html>
               <head/>
               <body>
-                <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.4">They were paying him a peppercorn retainer and keeping his access accounts live, with a view to ultimately publishing </span> <i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">Forked Tongues: The SocioPsychoLinguistics of the Ariekei</span></i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">.</span></span>
+                <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.2.4">They were paying him a peppercorn retainer and keeping his access accounts live, with a view to ultimately publishing </span><i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.3.1">Forked Tongues: The SocioPsychoLinguistics of the Ariekei</span></i><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.4.1">.</span></span>
                 <p/>
               </body>
             </html>
@@ -1244,7 +1244,7 @@ class TagSentencesTests: XCTestCase {
                   <span id="chapter_one-sentence1"><span id="kobo.85.2" class="calibre3">It was water in one’s boots on winter roads, a chest cough on a cold day, a bitter wind finding a chink in walls; it was sour wine, stringy meat, a tedious sermon in chapel, a ceremony running long in summer heat.</span></span>
                 </div>
                 <div class="fmtx">
-                  <span id="kobo.86.1" class="calibre3"><span id="chapter_one-sentence2">Unpleasantness was not the plague and burying children, it was not Sarantine Fire, not the Day of the Dead, or the <i class="calibre7">zubir</i> of the Aldwood appearing out of fog with blood dripping from its horns, it was not . <span id="kobo.86.2" class="calibre3"> .</span> <span id="kobo.86.3" class="calibre3"> .</span> <span id="kobo.86.4" class="calibre3"> this.</span></span></span>
+                  <span id="kobo.86.1" class="calibre3"><span id="chapter_one-sentence2">Unpleasantness was not the plague and burying children, it was not Sarantine Fire, not the Day of the Dead, or the <i class="calibre7">zubir</i> of the Aldwood appearing out of fog with blood dripping from its horns, it was not .<span id="kobo.86.2" class="calibre3"> .</span><span id="kobo.86.3" class="calibre3"> .</span><span id="kobo.86.4" class="calibre3"> this.</span></span></span>
                   <span id="chapter_one-sentence3"><span id="kobo.86.5" class="calibre3">It was not this.</span></span>
                 </div>
               </body>
@@ -1283,6 +1283,28 @@ class TagSentencesTests: XCTestCase {
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
     }
+    
+    func testEmptySpan2() throws {
+        let xml = """
+                 <p class="dl" id="ji256"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.15.1">S</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.16.1">ATURDAY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.17.1">, F</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.18.1">EBRUARY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.19.1"> 1, 2025</span></p>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body>
+                <p class="dl" id="ji256">
+                  <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.15.1">S</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.16.1">ATURDAY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.17.1">, F</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.18.1">EBRUARY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.19.1"> 1, 2025</span></span>
+                </p>
+              </body>
+            </html>
+            """
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+
 }
 
 
