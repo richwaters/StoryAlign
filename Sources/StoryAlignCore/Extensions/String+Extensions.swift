@@ -119,9 +119,18 @@ public extension String {
         return chunks
     }
     
+    var hrefWithoutFragment: String {
+          guard let i = firstIndex(of: "#") else { return self }
+          return String(self[..<i])
+      }
+    
     subscript(i: Int) -> Character {
         let idx = self.index(self.startIndex, offsetBy: i)
         return self[idx]
+    }
+    
+    var hasNonWhitespace: Bool {
+        !self.trimmed().isEmpty
     }
 }
 

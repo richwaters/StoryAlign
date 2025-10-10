@@ -97,11 +97,34 @@ public struct Aligner : SessionConfigurable, Sendable {
         logger.log(.debug, "Transcription timeline Hasdups \(fullTranscription.wordTimeline.hasDuplicateConsecutiveSpans())" )
         logger.log(.debug, "Transcription timeline hasOverlaps \(fullTranscription.wordTimeline.hasOverlaps)" )
         
-        let bodyMatterHrefs = ebook.nav?.bodymatterHrefs ?? []
-        var inBodyMatter = bodyMatterHrefs.isEmpty
-        let backMatterHrefs = ebook.nav?.backmatterHrefs ?? []
+        let bodyMatterHrefs = (ebook.nav?.bodymatterHrefs ?? []).map { $0.hrefWithoutFragment }
+        let backMatterHrefs = (ebook.nav?.backmatterHrefs ?? []).map { $0.hrefWithoutFragment }
         
         let sortedManifest = ebook.manifest.sorted { $0.spineItemIndex < $1.spineItemIndex }
+        let startManifestItem:EpubManifestItem? = {
+            guard let startChapter = sessionConfig.startChapter else {
+                return nil
+            }
+            let retItem = sortedManifest.first { $0.nameOrId == startChapter }
+            if retItem == nil {
+                logger.log( .warn, "Couldn't find start chapter:\(startChapter)" )
+            }
+            return retItem
+        }()
+        let endManifestItem:EpubManifestItem? = {
+            guard let endChapter = sessionConfig.endChapter else {
+                return nil
+            }
+            let  retItem = sortedManifest.first { $0.nameOrId == endChapter }
+            if retItem == nil {
+                logger.log( .warn, "Couldn't find end chapter:\(endChapter)" )
+            }
+            return retItem
+        }()
+        
+        
+        var inBodyMatter = bodyMatterHrefs.isEmpty && startManifestItem == nil
+
         let navDir = URL(filePath: ebook.nav?.href ?? "").deletingLastPathComponent().path()
         var manifestItems = sortedManifest.filter { manifestItem in
             let relPath = {
@@ -111,10 +134,23 @@ public struct Aligner : SessionConfigurable, Sendable {
                 }
                 return manifestHrefUrl.lastPathComponent
             }()
-            if backMatterHrefs.contains(manifestItem.href) || backMatterHrefs.contains(relPath) {
-                inBodyMatter = false
+
+            if let endManifestItem {
+                if manifestItem.nameOrId == endManifestItem.nameOrId {
+                    inBodyMatter = false
+                }
             }
-            if bodyMatterHrefs.contains(manifestItem.href) || bodyMatterHrefs.contains(relPath) {
+            else {
+                if backMatterHrefs.contains(manifestItem.href) || backMatterHrefs.contains(relPath) {
+                    inBodyMatter = false
+                }
+            }
+            if let startManifestItem {
+                if manifestItem.nameOrId == startManifestItem.nameOrId {
+                    inBodyMatter = true
+                }
+            }
+            else if bodyMatterHrefs.contains(manifestItem.href) || bodyMatterHrefs.contains(relPath) {
                 inBodyMatter = true
             }
             return inBodyMatter
@@ -123,7 +159,6 @@ public struct Aligner : SessionConfigurable, Sendable {
             logger.log(.warn, "Couldn't find bodymatter: \(bodyMatterHrefs.first!)")
             manifestItems = sortedManifest
         }
-
         
         let ebookSentenceCount = manifestItems.reduce(0) { $0 + ($1.xhtmlSentences.count) }
         progressUpdate(0, epubSentenceCount:ebookSentenceCount)
@@ -638,22 +673,30 @@ extension Aligner {
                         alignedSentences[alignedSentences.count - 1] = previousSentence
                         sharedTimeStamp = true
                     }
-                    
-                    /*
-                     This is for the whisper-1.7.6 update, which aligns further into segements it seems. Need to do some tuning to see what works best
+
                     let gap = start - previous.end
                     if gap > 0 {
+                        
+                        // Default to splitting the time between the 2 sentences equally.
                         start -= gap/2
                         let prevTimeStamp = previous.timeStamps.last!
+                        
+                        // If the sentences are in 2 different segments, use the segment information to split the gap
                         if prevTimeStamp.segmentIndex != startResult.segmentIndex {
                             let seg = transcription.segments[startResult.segmentIndex]
                             if seg.start < startResult.start && seg.start >= previous.end {
+                                // set the start of this sentence to the start of the segment
                                 start = seg.start
                             }
-                            //let prevEndSeg = transcription.segments[prevTimeStamp.segmentIndex]
+                            let prevEndSeg = transcription.segments[prevTimeStamp.segmentIndex]
+                            if prevEndSeg.end < start  {
+                                // If the previous segment ends before this one starts, backup the start to the end of the
+                                // previous segment. This might not always be smart but I think in most cases it's better
+                                // to move on asap.
+                                start = prevEndSeg.end
+                            }
                         }
                     }
-                     */
                     previous.end = start
                 }
                 else if previous.id == sentenceId - 1 {
