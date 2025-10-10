@@ -70,7 +70,7 @@ let package = Package(
         .binaryTarget(
             name: "WhisperFramework",
             url: "https://github.com/richwaters/whisper.cpp/releases/download/v1.7.6-static-xcframework/whisper-v1.7.6.xcframework.static.zip",
-            checksum: "77ee20de9c837fd66e555fa1bb3658c6889cfeee86cd5a101a1b141f6e97c4c9"
+            checksum: "8a2669bb1d34f79522cc49a8165bda5f92c22726fbc06a9b6ca268dcd8f077ab"
         ),
         
         .executableTarget(
