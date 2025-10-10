@@ -28,7 +28,7 @@ extension CliArgs {
 struct CliArgsParser {
     func parse<T:CliArgs>(from rawArgs: [String] = Array(CommandLine.arguments)) throws -> T {
         let args = Array(rawArgs.dropFirst())
-        let (raw, pos, dashFlags) = jsonAndPositionals(from: args)
+        var (raw, pos, dashFlags) = jsonAndPositionals(from: args)
         if !dashFlags.isEmpty {
             throw CliError("Unknown argument(s): \(dashFlags.joined(separator: ", "))")
         }
@@ -38,54 +38,67 @@ struct CliArgsParser {
             throw CliError("Unknown argument(s): \(invalid.joined(separator: ", "))")
         }
         
-        let data = try JSONSerialization.data(withJSONObject: raw)
-        
-        do {
-            var obj = try JSONDecoder().decode(T.self, from: data)
-            obj.positionals = pos
-            return obj
-        }
-        
-        catch let DecodingError.dataCorrupted(context) {
-            let path = context.codingPath
-                .map { $0.stringValue }
-                .joined(separator: ".")
-            let badVal = raw[path] as? String ?? "???"
-            throw CliError("Unknown value '\(badVal)' for '\(path)'")
-        }
-        catch let DecodingError.typeMismatch(type, context) {
-            let path = context.codingPath.map { $0.stringValue }.joined(separator: ".")
-            let badVal = raw[path] as? String ?? "???"
-
-            if type == Bool.self  {
-                // This is to handle case where the last option is a flag that doesn't take an argument,
-                // and the parser believes the positional to be that argument. This only occurs if the user
-                // has used the key<space>value, instead of the --key=value. Anyway. this adjusts for that
-                let isLastFlag = {
-                    let lastFlag = args.reversed().first { $0.hasPrefix("--") }
-                    
-                    guard let lastFlag else {
-                        return false
-                    }
-                    return lastFlag.safeSubstring(from: 2) == path
-                }()
-                if isLastFlag {
-                    var adjustedVals = raw
-                    adjustedVals[path] = true
-                    var adjustedPositions = pos
-                    adjustedPositions.insert(String(describing: badVal), at: 0)
-                    let fixedData = try JSONSerialization.data(withJSONObject: adjustedVals)
-                    var obj = try JSONDecoder().decode(T.self, from: fixedData)
-                    obj.positionals = adjustedPositions
-                    return obj
-                }
+        while true {
+            let data = try JSONSerialization.data(withJSONObject: raw)
+            
+            do {
+                var obj = try JSONDecoder().decode(T.self, from: data)
+                obj.positionals = pos
+                return obj
             }
             
-            throw CliError( "Invalid value: '\(badVal)' for '\(path)': expected \(type)" )
-        } catch let DecodingError.keyNotFound(key, _) {
-            throw CliError( "Missing required argument: \(key.stringValue)" )
-        } catch {
-            throw CliError("Failed to parse arguments: \(error)")
+            catch let DecodingError.dataCorrupted(context) {
+                let path = context.codingPath
+                    .map { $0.stringValue }
+                    .joined(separator: ".")
+                let badVal = raw[path] as? String ?? "???"
+                throw CliError("Unknown value '\(badVal)' for '\(path)'")
+            }
+            catch let DecodingError.typeMismatch(type, context) {
+                let path = context.codingPath.map { $0.stringValue }.joined(separator: ".")
+                let badVal = raw[path] as? String ?? "???"                
+                if type == String.self {
+                    // This is to handle the case where a string was interpreted as a number.
+                    // To avoid the throw that requires this fix, include " around the string
+                    if let i = raw[path] as? Int {
+                        raw[path] = String(i)
+                        continue
+                    }
+                    if let d = raw[path] as? Double {
+                        raw[path] = String(d)
+                        continue
+                    }
+                }
+                if type == Bool.self  {
+                    // This is to handle case where the last option is a flag that doesn't take an argument,
+                    // and the parser believes the positional to be that argument. This only occurs if the user
+                    // has used the key<space>value, instead of the --key=value. Anyway. this adjusts for that
+                    let isLastFlag = {
+                        let lastFlag = args.reversed().first { $0.hasPrefix("--") }
+                        guard let lastFlag else {
+                            return false
+                        }
+                        return lastFlag.safeSubstring(from: 2) == path
+                    }()
+                    if isLastFlag {
+                        var adjustedVals = raw
+                        adjustedVals[path] = true
+                        var adjustedPositions = pos
+                        adjustedPositions.insert(String(describing: badVal), at: 0)
+                        let fixedData = try JSONSerialization.data(withJSONObject: adjustedVals)
+                        var obj = try JSONDecoder().decode(T.self, from: fixedData)
+                        obj.positionals = adjustedPositions
+                        return obj
+                    }
+                }
+                
+                throw CliError( "Invalid value: '\(badVal)' for '\(path)': expected \(type)" )
+                
+            } catch let DecodingError.keyNotFound(key, _) {
+                throw CliError( "Missing required argument: \(key.stringValue)" )
+            } catch {
+                throw CliError("Failed to parse arguments: \(error)")
+            }
         }
     }
     
