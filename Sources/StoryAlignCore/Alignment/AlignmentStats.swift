@@ -186,9 +186,16 @@ public class AlignmentReportBuilder : SessionConfigurable {
     public func buildReport( epubPath:URL?, audioPath:URL?, outPath:URL?  ) -> AlignmentReport {
         
         let toolTitle = "\(sessionConfig.toolName ?? "") \(sessionConfig.version ?? "")"
+        
+        let osVersion = {
+            let v = ProcessInfo.processInfo.operatingSystemVersion
+            if v.patchVersion > 0 { return "\(v.majorVersion).\(v.minorVersion).\(v.patchVersion)" }
+            return "macOS \(v.majorVersion).\(v.minorVersion)"
+        }()
 
         let rpt = AlignmentReport(
             toolTitle: toolTitle,
+            osVersion: osVersion,
             epubPath: epubPath,
             audioPath: audioPath,
             outputPath: outPath,
@@ -488,6 +495,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
 
 public struct AlignmentReport : Codable {
     let toolTitle:String
+    let osVersion:String
     let epubPath: URL?
     let audioPath: URL?
     let outputPath: URL?
@@ -567,6 +575,7 @@ public struct AlignmentReportFormatter : SessionConfigurable {
         //if sessionConfig.transcriber == .whisper {
         s +=     "Model:    \(report.modelName)\n"
         s +=     "Beam:     \(report.beamSize)\n"
+        s +=     "OS:       \(report.osVersion)\n"
         //}
         s +=  sep2Str
         s +=     "Run time: \(report.runtime.HHMMSS)\n"
