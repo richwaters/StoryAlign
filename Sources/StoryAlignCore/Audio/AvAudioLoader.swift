@@ -83,16 +83,18 @@ extension AvAudioLoader {
         try file.read(into: inBuf)
         
         let ratio     = outFmt.sampleRate / inFmt.sampleRate
-        let outFrames = max( inBuf.frameCapacity, AVAudioFrameCount(Double(inBuf.frameLength) * ratio))
+        let outFrames = AVAudioFrameCount((Double(inBuf.frameLength) * ratio).rounded(.up))
         let outBuf    = AVAudioPCMBuffer(pcmFormat: outFmt, frameCapacity: outFrames)!
         
         final class InputState: @unchecked Sendable {
             let fmt: AVAudioFormat
             let channels: [UnsafePointer<Float>]
+            let buf: AVAudioPCMBuffer
             var pos: AVAudioFramePosition = 0
             init(fmt: AVAudioFormat, buf: AVAudioPCMBuffer) {
                 self.fmt = fmt
-                let fcd = buf.floatChannelData!
+                self.buf = buf
+                let fcd = self.buf.floatChannelData!
                 let n = Int(fmt.channelCount)
                 self.channels = (0..<n).map { UnsafePointer(fcd[$0]) }
             }
