@@ -32,5 +32,13 @@ done
 
 rm ${NARRATED}.epub
 
+MODELNAME="ggml-${MODEL}.bin"
+test_info="testInfo.json"
+tmp="${test_info}.tmp"
+jq --arg model "$MODELNAME" --arg checksum "$checksum" '
+      .testConfigs |= (map(if .modelName == $model then .expectedSha256 = $checksum else . end))
+' "$test_info" > "$tmp"
+mv "$tmp" "$test_info"
+
 echo ${checksum}
 
