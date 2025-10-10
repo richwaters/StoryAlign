@@ -67,7 +67,9 @@ struct StoryAlignMain {
             version: StoryAlignVersion().shortVersionStr,
             whisperBeamSize: storyAlignArgs.whisperBeamSize,
             whisperDtw: storyAlignArgs.whisperDtw,
-            reportType: storyAlignArgs.reportType ?? .none
+            reportType: storyAlignArgs.reportType ?? .none,
+            startChapter: storyAlignArgs.startChapter,
+            endChapter: storyAlignArgs.endChapter
         )
         defer {
             sessionConfig.cleanup()
@@ -148,7 +150,7 @@ extension StoryAlignMain {
             try? fm.removeItem(at: cli.outputURL)
         }
         
-        try "test".write(toFile: cli.outputURL.path(), atomically: true, encoding: .utf8)
+        try "test".write(to: cli.outputURL, atomically: true, encoding: .utf8)
         try fm.removeItem(at: cli.outputURL)
         
         if cli.runStage != nil {

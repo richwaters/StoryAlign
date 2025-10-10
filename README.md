@@ -85,6 +85,22 @@ storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<f
       helpful if you encounter issues with the default. To make use of
       it, you must have ffmpeg installed on your system and in your path.
 
+**--start-chapter**=<chapter name>
+      Specify the first chapter to align. This helps storyalign by 
+      allowing it to skip over chapters like the table of contents, 
+      forewords, etc. that are not in the audiobook. To some extent, this
+      the epub itself provides this information in the form of a 'bodymatter'
+      tag, but that is not always the case, and it often doesn't align with
+      the true start of the audiobook. 
+    
+**--end-chapter**=<chapter name>
+      Specify the end chapter of the book, where 'end' meand the chapter
+      after the last chapted to align. This helps storyalign avoid attempting
+      the alignment of chapters like afterwords, acknowledgements, next reads, etc.
+      Some books provide a 'backmatter' tag that provide this type of information, 
+      but others do not.
+      
+
 **--version**
       Show version information
 
@@ -123,7 +139,7 @@ storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<f
       and persisted data.
 
 **--stage** (epub|audio|transcribe|align|xml|export|report|all)
-      The processing stage to be run. When set, \(toolName) expects to find 
+      The processing stage to be run. When set, storyalign expects to find 
       intermediate files stored in the directory pointed to by the session-dir
       argument. It will re-generate missing information required to run
       the specified stage.

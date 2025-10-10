@@ -33,7 +33,9 @@ public final class SessionConfig : Sendable {
     public let whisperBeamSize:Int
     public let whisperDtw:Bool
     public let reportType:ReportType
-    
+    public let startChapter:String?
+    public let endChapter:String?
+
     var modelName:String {
         URL(fileURLWithPath: modelFile).deletingPathExtension().lastPathComponent
     }
@@ -50,7 +52,9 @@ public final class SessionConfig : Sendable {
                 version:String? = nil,
                 whisperBeamSize:Int? = nil,
                 whisperDtw:Bool? = false,
-                reportType:ReportType = .none
+                reportType:ReportType = .none,
+                startChapter:String? = nil,
+                endChapter:String? = nil,
     ) throws {
         self.runStage = runStage ?? .all
         self.modelFile = modelFile
@@ -62,7 +66,8 @@ public final class SessionConfig : Sendable {
         self.version = version
         self.whisperDtw = whisperDtw ?? false
         self.reportType = reportType
-        
+        self.startChapter = startChapter
+        self.endChapter = endChapter
         
         self.whisperBeamSize = {
             if let beamSize = whisperBeamSize {

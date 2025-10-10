@@ -28,7 +28,7 @@ struct StoryAlignHelp {
       \(toolName) <ebook> <audiobook>
     
     Usage:
-      \(toolName) [--help] [--version] [--outfile=<file>] [--log-level=\(orLogLevel)] [--no-progress] [--throttle] [--whisper-model=<file>] [--audio-loader=\(orAudioLoader)] [--report=\(orReportType)] [--whiper-beam-size=<number>] [--whisper-dtw] [--session-dir=<directory>] [--stage=\(orStages)] <ebook> <audiobook>
+      \(toolName) [--help] [--version] [--outfile=<file>] [--log-level=\(orLogLevel)] [--no-progress] [--throttle] [--whisper-model=<file>] [--audio-loader=\(orAudioLoader)] [--report=\(orReportType)] [--whiper-beam-size=<number>] [--whisper-dtw] [--session-dir=<directory>] [--stage=\(orStages)] [--start-chapter=<chapter name>] [--end-chapted=<chapter name>] <ebook> <audiobook>
     """
     
     static let argsDescription = """
@@ -78,6 +78,21 @@ struct StoryAlignHelp {
           FFmpeg command-line utility to load and decode audio. This might be
           helpful if you encounter issues with the default. To make use of 
           it, you must have ffmpeg installed on your system and in your path.
+    
+      --start-chapter=<chapter name>
+          Specify the first chapter to align. This helps \(toolName) by 
+          allowing it to skip over chapters like the table of contents, 
+          forewords, etc. that are not in the audiobook. To some extent, this
+          the epub itself provides this information in the form of a 'bodymatter'
+          tag, but that is not always the case, and it often doesn't align with
+          the true start of the audiobook. 
+    
+      --end-chapter=<chapter name>
+          Specify the end chapter of the book, where 'end' meand the chapter
+          after the last chapted to align. This helps \(toolName) avoid attempting
+          the alignment of chapters like afterwords, acknowledgements, next reads, etc.
+          Some books provide a 'backmatter' tag that provide this type of information, 
+          but others do not.
     
       --version 
           Show version information
@@ -150,6 +165,8 @@ struct StoryAlignArgs: CliArgs {
     var runStage: ProcessingStage?
     var throttle:Bool?
     var reportType:ReportType?
+    var startChapter:String?
+    var endChapter:String?
     var positionals: [String]?
     
     var ebook: String {
@@ -170,6 +187,8 @@ struct StoryAlignArgs: CliArgs {
         case sessionDir = "session-dir"
         case runStage = "stage"
         case reportType = "report"
+        case startChapter = "start-chapter"
+        case endChapter = "end-chapter"
         case throttle
         
         //'positionals' left out of CodingKeys so it will never be filled in by JSON decoder
