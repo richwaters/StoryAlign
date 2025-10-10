@@ -13,7 +13,7 @@ struct FfAudioLoader : AudioLoader {
     let sessionConfig: SessionConfig
 
     func decode(from fileURL: URL) async throws -> [Float] {
-        let audioData = try await FfMpegger().run(withArguments: [
+        let audioData = try await FfMpegger(sessionConfig: sessionConfig).run(withArguments: [
             "-i", fileURL.path,
             "-f", "f32le",
             "-acodec", "pcm_f32le",
@@ -35,19 +35,19 @@ struct FfAudioLoader : AudioLoader {
     
     func extractAudio( from url:URL, using audioFileInfo:AudioFile ) async throws {
         let args = [
-          "-vn",
-          "-ss",
-          "\(audioFileInfo.startTmeInterval)",
-          "-to",
-          "\(audioFileInfo.endTmeInterval)",
-          "-i",
-          url.absoluteString,
-          "-c:a",
-          "copy",
-          audioFileInfo.filePath.absoluteString
+            "-vn",
+            "-ss",
+            "\(audioFileInfo.startTmeInterval)",
+            "-to",
+            "\(audioFileInfo.endTmeInterval)",
+            "-i",
+            url.path(),
+            "-c:a",
+            "copy",
+            audioFileInfo.filePath.path()
         ]
         
-        try await FfMpegger().run(withArguments: args)
+        try await FfMpegger(sessionConfig: sessionConfig).run(withArguments: args)
     }
     
     /*
@@ -214,15 +214,19 @@ struct FfProber {
 }
 
 struct FfMpegger {
-    //let sessionConfig:SessionConfig
-    //var logger:Logger { sessionConfig.logger }
+    let sessionConfig:SessionConfig
+    var logger:Logger { sessionConfig.logger }
+    
     @discardableResult func run( withArguments args:[String] ) async throws -> Data {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = ["ffmpeg"] + args
         
-        //logger.log( .debug,  "Running: \(args.joined(se))" )
+        let logArgs = ["-loglevel", "quiet", "-hide_banner" ]
+        let noStdinArgs = ["-y", "-nostdin"]
+        process.arguments = ["ffmpeg"] + noStdinArgs + logArgs + args
         
+        logger.log( .debug,  "Running: \(process.arguments!.joined(separator: " "))" )
+
         let outputPipe = Pipe()
         process.standardOutput = outputPipe
         process.standardError = Pipe()
@@ -242,7 +246,6 @@ struct FfMpegger {
         if process.terminationStatus != 0 {
             throw StoryAlignError( "Error using FFMPEG to decode audio: \(process.terminationStatus)")
         }
-        
         
         return fullData
     }
