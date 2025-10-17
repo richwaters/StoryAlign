@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-set -x
+#set -x
 
 DIFFTOOL="jbdiff.sh"
 #DIFFTOOL="bcomp"
