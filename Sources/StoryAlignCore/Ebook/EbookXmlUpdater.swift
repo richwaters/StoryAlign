@@ -31,7 +31,7 @@ struct MediaOverlay {
     }
 
     var audioFiles: [AudioFile] {
-        Array(Set(sentenceRanges.map(\.audioFile)))
+        Array(Set(sentenceRanges.map(\.audioFile))).sorted { $0.filePath.path() < $1.filePath.path() }
     }
 
     var overlayXml: String {
@@ -255,7 +255,10 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
         
         var completed: [AudioFile] = []
         for overlay in mediaOverlays {
-            for audioFile in overlay.audioFiles where !completed.contains(audioFile) {
+            for audioFile in overlay.audioFiles {
+                if completed.contains(audioFile) {
+                    continue
+                }
                 try addItem(to: manifest, id: audioFile.itemId, href: audioFile.href, mediaType: audioFile.mediaType)
                 completed.append(audioFile)
             }
