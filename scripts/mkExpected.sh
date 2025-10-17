@@ -20,12 +20,32 @@ while [ ! -f "$package_root/Package.swift" ] && [ "$package_root" != "/" ]; do
   package_root=$(dirname "$package_root")
 done
 
+EPUBSTRIP="${package_root}/scripts/epubstrip.sh"
+
 swift run storyalign --report=json --outfile=${NARRATED}.epub ${BOOK}.epub ${BOOK}.m4b
 
-checksum=`${package_root}/scripts/epubstrip.sh ${NARRATED}.epub`
+checksum=`${EPUBSTRIP} ${NARRATED}.epub`
+
+prev_checksum="$(jq -r --arg model "ggml-${MODEL}.bin" '.testConfigs[]? | select(.modelName == $model) | .expectedSha256 // empty' "testInfo.json" | head -n1)"
+
+expected_stripped="expected/${NARRATED}.epub.stripped" 
+prev_checksum2=$checksum
+if [ -f "${expected_stripped}" ]; then
+    prev_checksum2=`${EPUBSTRIP} --sum-only "${expected_stripped}"`
+fi
+
+if [ -n "${prev_checksum}" ] && [ "${prev_checksum}" != "null" ] && [ "${checksum}" = "${prev_checksum}" ]; then
+    if [ "${checksum}" = "${prev_checksum2}" ]; then
+        echo "No change"
+        rm -f "${NARRATED}.epub" "${NARRATED}.epub.stripped"
+        for f in ${NARRATED}-*.json; do
+            rm ${f}
+        done
+        exit 0
+    fi
+fi
 
 mv ${NARRATED}.epub.stripped ./expected
-
 for f in ${NARRATED}-*.json; do
     mv -- "$f" expected/"${f%-[0-9]*-[0-9]*}.json"
 done
