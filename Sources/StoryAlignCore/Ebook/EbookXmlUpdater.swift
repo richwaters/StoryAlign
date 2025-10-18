@@ -12,56 +12,6 @@
 import Foundation
 import SwiftSoup
 
-struct MediaOverlay {
-    let baseURL: URL
-    let manifestItem: EpubManifestItem
-    let sentenceRanges: [SentenceRange]
-
-    var itemId: String {
-        manifestItem.id + "_overlay"
-    }
-
-    var href: String {
-        let basename = manifestItem.filePath!.deletingPathExtension().lastPathComponent
-        return "MediaOverlays/\(basename).smil"
-    }
-
-    var filePath: URL {
-        baseURL.appendingPathComponent(href)
-    }
-
-    var audioFiles: [AudioFile] {
-        Array(Set(sentenceRanges.map(\.audioFile))).sorted { $0.filePath.path() < $1.filePath.path() }
-    }
-
-    var overlayXml: String {
-        var xml = """
-        <smil xmlns=\"http://www.w3.org/ns/SMIL\" xmlns:epub=\"http://www.idpf.org/2007/ops\" version=\"3.0\">
-          <body>
-            <seq id=\"\(itemId)\" epub:textref=\"../\(manifestItem.href)\" epub:type=\"chapter\">
-        """
-
-        for sr in sentenceRanges {
-            let sid = "\(manifestItem.id)-sentence\(sr.id)"
-            let clipBegin = String(format: "%.3fs", sr.start)
-            let clipEnd = String(format: "%.3fs", sr.end)
-
-            xml += """
-              <par id=\"\(sid)\">
-                <text src=\"../\(manifestItem.href)#\(sid)\"/>
-                <audio src=\"../Audio/\(sr.audioFile.filePath.lastPathComponent)\" clipBegin=\"\(clipBegin)\" clipEnd=\"\(clipEnd)\"/>
-              </par>
-            """
-        }
-
-        xml += """
-            </seq>
-          </body>
-        </smil>
-        """
-        return xml
-    }
-}
 
 public struct XMLUpdater : SessionConfigurable,Sendable {
     public let sessionConfig: SessionConfig
@@ -251,18 +201,15 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
         
         try metadata.appendChild(buildMeta(attributes: [("property","media:duration")], text: totalDuration.HHMMSSs))
         try metadata.appendChild(buildMeta(attributes: [("property","media:active-class")], text: "-epub-media-overlay-active"))
-        
-        
-        var completed: [AudioFile] = []
+                
         for overlay in mediaOverlays {
-            for audioFile in overlay.audioFiles {
-                if completed.contains(audioFile) {
-                    continue
-                }
-                try addItem(to: manifest, id: audioFile.itemId, href: audioFile.href, mediaType: audioFile.mediaType)
-                completed.append(audioFile)
-            }
             try addItem(to: manifest, id: overlay.itemId, href: overlay.href, mediaType: "application/smil+xml")
+        }
+        
+        let audioFiles = Array( Set( mediaOverlays.flatMap { $0.audioFiles } ) )
+        let sortedAudioFiles = audioFiles.sorted { $0.filePath.path() < $1.filePath.path() }
+        for audioFile in sortedAudioFiles {
+            try addItem(to: manifest, id: audioFile.itemId, href: audioFile.href, mediaType: audioFile.mediaType)
         }
     }
 
