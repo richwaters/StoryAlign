@@ -5,7 +5,7 @@
   "testConfigs": [
     {
       "modelName": "ggml-tiny.en.bin",
-      "expectedSha256": "1b692f785639f1b92164853c07c9282cfdb72c29c429aa54048db93f2d06ef88"
+      "expectedSha256": "114dfda85434ee57260f2561ba769ae96895ba531997489585a542a8f6222c50"
     }
   ]
 }

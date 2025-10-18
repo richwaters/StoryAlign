@@ -2,15 +2,15 @@
   "alignmentStats" : {
     "chapterSentenceCount" : 1298,
     "exactMatches" : 16,
-    "interpolated" : 6,
-    "matchesIgnoringAllPunctuation" : 279,
-    "matchesIgnoringEndsPunctuation" : 129,
+    "interpolated" : 5,
+    "matchesIgnoringAllPunctuation" : 281,
+    "matchesIgnoringEndsPunctuation" : 122,
     "missedChapterSentences" : 3,
     "missedChapters" : 1,
-    "nearMatchs" : 645,
-    "recoverable" : 23,
-    "skipped" : 33,
-    "trimmedLeadingMatches" : 197
+    "nearMatchs" : 643,
+    "recoverable" : 18,
+    "skipped" : 27,
+    "trimmedLeadingMatches" : 210
   },
   "audioPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2.m4b",
   "beamSize" : 7,
@@ -26,7 +26,7 @@
           "duration" : 4.920999999999999,
           "pace" : 0.15378124999999998,
           "transcriptionSentence" : " My initiation into the mysteries of space.",
-          "zscore" : -3.423794614422689
+          "zscore" : -3.375465871049093
         }
       ]
     },
@@ -40,7 +40,7 @@
           "duration" : 27.67999999999995,
           "pace" : 0.39542857142857074,
           "transcriptionSentence" : " Now my humble fear is that this double training in language as well as in thought , imposes somewhat too heavy a burden upon the young , especially when , at the age of three years old , they are taken from the maternal care and taught to unlearn the old language , except for the purpose of repeating it in the presence of the mothers and nurses , and to learn the vocabulary and idiom of science.",
-          "zscore" : -3.323213521171976
+          "zscore" : -3.4090519949836158
         }
       ]
     },
@@ -54,7 +54,7 @@
           "duration" : 24.980000000000018,
           "pace" : 0.4233898305084749,
           "transcriptionSentence" : " The frail form of a woman being liable to be shattered by such an approximation must be preserved by by the state ; but since women cannot be distinguished by the sense of sight from men , below ordained universally , that neither man nor woman shall be approached so closely as to destroy the interval between the approximator and the approximated.",
-          "zscore" : -3.0461698589216777
+          "zscore" : -3.756309788725462
         }
       ]
     },
@@ -68,29 +68,7 @@
           "duration" : 29.875,
           "pace" : 0.3734375,
           "transcriptionSentence" : " Then he added more mildly , \" I have a message , dear madam , to your husband , which I must not deliver in your presence , and if you would suffer us to retire for a few minutes ? But my wife would not listen to the proposal that our august visitor should sow in commode himself , and assuring the circle that the hour of her own retirement had long passed , with many reiterated apologies for her recent indiscretion she had last retreated to her apartment.",
-          "zscore" : -10.755738264134145
-        }
-      ]
-    },
-    {
-      "chapterId" : "chapter-16.xhtml",
-      "chapterName" : "XVI: How the Stranger Vainly End",
-      "sentences" : [
-        {
-          "chapterSentence" : "Stranger.",
-          "chapterSentenceId" : 13,
-          "duration" : 0.09999999999999432,
-          "pace" : 0.09999999999999432,
-          "transcriptionSentence" : " \"",
-          "zscore" : -1.8713601892174734
-        },
-        {
-          "chapterSentence" : "Stranger.",
-          "chapterSentenceId" : 48,
-          "duration" : 0.13999999999998636,
-          "pace" : 0.13999999999998636,
-          "transcriptionSentence" : " I",
-          "zscore" : -1.814636957501013
+          "zscore" : -7.431096813531884
         }
       ]
     },
@@ -104,7 +82,7 @@
           "duration" : 16.414999999999992,
           "pace" : 0.3097169811320753,
           "transcriptionSentence" : " For example , I am ascending , now I can see your neighbor the hexagon and his family in their several apartments , now I see the inside of the theater , ten doors off from which the audience is only just departing , and on the other side a circle in his study sitting at his books.",
-          "zscore" : -5.955136297000994
+          "zscore" : -4.807061810600583
         }
       ]
     },
@@ -119,14 +97,6 @@
           "pace" : 0.362191780821917,
           "transcriptionSentence" : " What therefore more easy than now to take a servant on a second journey into the blessed region of the fourth dimension , where I shall look down with him once more upon this This land of three dimensions and see the inside of every three dimensioned house. The secrets of the solid earth , the treasures , the minds of space-land , and the intestines of every solid living creature , even the noble and adorable spheres...sphere.",
           "zscore" : -4.469216860640897
-        },
-        {
-          "chapterSentence" : "Nay, I despair not that, even here, in this region of Three Dimensions, your Lordship's art may make the Fourth Dimension visible to me; just as in the Land of Two Dimensions my teacher's skill would fain have opened the eyes of his blind servant to the invisible presence of a Third Dimension, though I saw it not.",
-          "chapterSentenceId" : 60,
-          "duration" : 20.414999999999964,
-          "pace" : 0.351982758620689,
-          "transcriptionSentence" : " Nay , I despair not that even here in this region of three dimensions , your lordships art may make the fourth dimension visible to me , just as in the land of two dimensions my teacher's skill would feign have opened the eyes of his blind servant to the invisible presence of a third dimension , though I saw it not.",
-          "zscore" : -3.2104763810836983
         }
       ]
     },
@@ -141,6 +111,20 @@
           "pace" : 0.37070422535211256,
           "transcriptionSentence" : " Discussing the matter with him a mere boy I should be in perfect safety for he would know nothing of the proclamation of the council , whereas I could not feel sure that my sons , so greatly did their patriotism and reverence for the circles predominate over mere blind affection , might not feel compelled to hand me over to the prefect if they found me seriously maintaining the seditious heresy of the third dimension.",
           "zscore" : -3.3687747481040247
+        }
+      ]
+    },
+    {
+      "chapterId" : "chapter-22.xhtml",
+      "chapterName" : "XXII: How I Then Tried to Diffus",
+      "sentences" : [
+        {
+          "chapterSentence" : "Only, with the view of evading the law, if possible, I spoke not of a physical Dimension, but of a Thoughtland whence, in theory, a Figure could look down upon Flatland and see simultaneously the insides of all things, and where it was possible that there might be supposed to exist a Figure environed, as it were, with six Squares, and containing eight terminal Points.",
+          "chapterSentenceId" : 5,
+          "duration" : 25.119999999999997,
+          "pace" : 0.3864615384615384,
+          "transcriptionSentence" : " Only , with the view of evading the law , if possible , I spoke not of a physical dimension , but of a thought land , whence , in theory , a figure could look down upon flatland and see simultaneously the insides of all things , and where it was possible that there might be supposed to exist , a figure invariant as it were with six squares and containing eight terminal points.",
+          "zscore" : -3.5409183974918936
         }
       ]
     }
@@ -231,8 +215,8 @@
       ]
     }
   ],
-  "runtime" : 131.7475860118866,
-  "score" : 98.14,
+  "runtime" : 191.58251297473907,
+  "score" : 98.3,
   "shortDurationSentences" : [
 
   ],
@@ -242,56 +226,64 @@
       "chapterName" : "XV: Concerning a Stranger from S",
       "sentences" : [
         {
+          "chapterSentence" : "Concerning a Stranger from Spaceland",
+          "chapterSentenceId" : 1,
+          "duration" : 12.96,
+          "pace" : 2.592,
+          "transcriptionSentence" : " concerning a stranger from spaceland.",
+          "zscore" : 11.576183130698862
+        },
+        {
           "chapterSentence" : "My four sons and two orphan Grandchildren had retired to their several apartments; and my wife alone remained with me to see the old Millennium out and the new one in.",
           "chapterSentenceId" : 5,
           "duration" : 49.72,
           "pace" : 1.6038709677419354,
           "transcriptionSentence" : " My four sons , and two orphan grandchildren , had retired to their several apartments , and my wife alone remained with me to see the old millennium out , and the new one in.",
-          "zscore" : 19.254594901917883
+          "zscore" : 18.337184284567847
         }
       ]
     }
   ],
   "stageRunTimes" : {
     "align" : [
-      781569337.572151,
-      781569411.226267
+      782409949.759285,
+      782410044.900911
     ],
     "audio" : [
-      781569283.399375,
-      781569284.494479
+      782409858.499656,
+      782409859.762776
     ],
     "epub" : [
-      781569282.915209,
-      781569283.399343
+      782409857.860931,
+      782409858.49962
     ],
     "export" : [
-      781569411.823027,
-      781569414.662883
+      782410045.449395,
+      782410049.443529
     ],
     "report" : [
-      781569414.662894,
-      781569414.747744
+      782410049.443549,
+      782410049.552544
     ],
     "transcribe" : [
-      781569284.494488,
-      781569337.572144
+      782409859.762784,
+      782409949.759276
     ],
     "xml" : [
-      781569411.226298,
-      781569411.823018
+      782410044.900933,
+      782410045.449384
     ]
   },
-  "toolTitle" : "storyalign 0.9.3-dev",
+  "toolTitle" : "storyalign 1.0-dev",
   "transcriptionStats" : {
-    "averagePace" : 0.4537863482869338,
-    "avgSecsPerVoiceLen" : 0.0994263749771708,
-    "endGaps" : 879,
+    "averagePace" : 0.45408347513596786,
+    "avgSecsPerVoiceLen" : 0.09938534653868035,
+    "endGaps" : 864,
     "fastPaceThreshold" : 0.15,
     "fastPaced" : 0,
-    "medianPace" : 0.43200000000000005,
+    "medianPace" : 0.43155555555555497,
     "repaired" : 0,
-    "segmentsCount" : 2449,
-    "startGaps" : 869
+    "segmentsCount" : 2454,
+    "startGaps" : 873
   }
 }
