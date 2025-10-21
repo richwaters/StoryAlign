@@ -66,11 +66,10 @@ let package = Package(
                 "."
             ],
         ),
-
         .binaryTarget(
-            name: "WhisperFramework",
-            url: "https://github.com/richwaters/whisper.cpp/releases/download/v1.8.0-static-xcframework/whisper-v1.8.0.xcframework.static.zip",
-            checksum: "eb78ed4827b28475a7cda010647bc3d6bfd65bd78bd93007f725cb0e69d7ffc0"
+        name: "WhisperFramework",
+        url: "https://codeberg.org/richwaters/whisper.cpp-static-binaries/releases/download/v1.8.2-static-xcframework/whisper-v1.8.2.xcframework.static.zip",
+        checksum: "a8b3947d4b2b63d90fca71613aa0369180a68f80859318eacb66bc80b8daffe1"
         ),
         
         .executableTarget(
