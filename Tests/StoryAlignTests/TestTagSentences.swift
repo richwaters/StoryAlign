@@ -410,7 +410,7 @@ class TagSentencesTests: XCTestCase {
               <head>
                 <link href="../styles/9781534431010.css" rel="stylesheet" type="text/css" />
                 <link href="../styles/SS_global.css" rel="stylesheet" type="text/css" />
-                <link rel="stylesheet" href="../../Styles/storyalign.css" type="text/css" />
+                <link rel="stylesheet" href="../../\(AssetPaths.styles)/storyalign.css" type="text/css" />
               </head>
               <body>
                 <blockquote class="blockquotelet">
@@ -433,7 +433,7 @@ class TagSentencesTests: XCTestCase {
               <head>
                 <link href="../styles/9781534431010.css" rel="stylesheet" type="text/css"/>
                 <link href="../styles/SS_global.css" rel="stylesheet" type="text/css"/>
-                <link rel="stylesheet" href="../../Styles/storyalign.css" type="text/css"/>
+                <link rel="stylesheet" href="../../\(AssetPaths.styles)/storyalign.css" type="text/css" />
               </head>
               <body>
                 <blockquote class="blockquotelet">
@@ -1296,6 +1296,43 @@ class TagSentencesTests: XCTestCase {
                 <p class="dl" id="ji256">
                   <span id="chapter_one-sentence0"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.15.1">S</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.16.1">ATURDAY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.17.1">, F</span><span class="small-caps"><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.18.1">EBRUARY</span></span><span xmlns="http://www.w3.org/1999/xhtml" class="koboSpan" id="kobo.19.1"> 1, 2025</span></span>
                 </p>
+              </body>
+            </html>
+            """
+        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
+        XCTAssert(result == expected)
+    }
+    
+    func testPg1() throws {
+        let xml = """
+            <body epub:type="bodymatter">
+              <section epub:type="chapter" role="doc-chapter" aria-labelledby="ch1">
+                <span role="doc-pagebreak" epub:type="pagebreak" id="pg_1" aria-label="1"/>
+                <hgroup>
+                  <h1 class="CHAPTER" id="ch1">
+                    <span class="CN"><a href="contents.xhtml#c_ch1"><b>1</b></a></span>
+                    <span class="CT"><a href="contents.xhtml#c_ch1"><b>PANIC! AT THE SPONSORAMA</b></a></span>
+                  </h1>
+                </hgroup>
+              </section>
+            </body>
+            """
+        let expected = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <html>
+              <head/>
+              <body epub:type="bodymatter">
+                <section epub:type="chapter" role="doc-chapter" aria-labelledby="ch1">
+                  <span role="doc-pagebreak" epub:type="pagebreak" id="pg_1" aria-label="1"/>
+                  <hgroup>
+                    <h1 class="CHAPTER" id="ch1">
+                      <span id="chapter_one-sentence0"><span class="CN"><a href="contents.xhtml#c_ch1"><b>1</b></a></span><span class="CT"><a href="contents.xhtml#c_ch1"><b>PANIC! </b></a></span></span>
+                      <span id="chapter_one-sentence1"><span class="CT"><a href="contents.xhtml#c_ch1"><b>AT THE SPONSORAMA</b></a></span></span>
+                    </h1>
+                  </hgroup>
+                </section>
               </body>
             </html>
             """
