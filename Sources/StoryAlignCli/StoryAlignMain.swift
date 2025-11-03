@@ -35,6 +35,7 @@ struct StoryAlignMain {
             try await runCli()
         }
         catch let err as CliError {
+            print()
             print("Error: \(err)")
             print("====")
             print(StoryAlignHelp.usage)
