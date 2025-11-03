@@ -13,7 +13,7 @@ import Foundation
  * These lets are auto-filled by scripts/update_version.sh and/or scripts/update_buildnum.sh. The Makefile uses those scripts to invoke changes. It would be nice if SPM prebuild plugins worked correctly, which would address the build issue, at least, but they don't.
  */
 fileprivate let storyAlignVersion = "0.13"
-fileprivate let storyAlignBuild = "202511021818"
+fileprivate let storyAlignBuild = "202511030743"
 ////////////////////////
 
 
