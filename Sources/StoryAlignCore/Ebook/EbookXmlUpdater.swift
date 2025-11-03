@@ -218,9 +218,9 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
             throw StoryAlignError("Manifest not found.")
         }
 
-        try addItem(to: manifest, id: "storyalignstyles", href: "Styles/storyalign.css", mediaType: "text/css")
+        try addItem(to: manifest, id: "storyalignstyles", href: "\(AssetPaths.styles)/storyalign.css", mediaType: "text/css")
 
-        let stylesDirPath = eBook.opfURL.deletingLastPathComponent().appendingPathComponent("Styles")
+        let stylesDirPath = eBook.opfURL.deletingLastPathComponent().appendingPathComponent(AssetPaths.styles)
         let stylesPath = stylesDirPath.appendingPathComponent("storyalign.css")
         try FileManager.default.createDirectory(at: stylesDirPath, withIntermediateDirectories: true)
         try cssStyle.write(to: stylesPath, atomically: true, encoding: .utf8)

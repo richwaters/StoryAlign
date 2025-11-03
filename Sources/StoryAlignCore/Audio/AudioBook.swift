@@ -34,7 +34,7 @@ public struct AudioFile : Codable, Hashable, Sendable {
     var duration:TimeInterval { endTmeInterval - startTmeInterval }
     
     var href:String {
-        "Audio/\(filePath.lastPathComponent)"
+        "\(AssetPaths.audio)/\(filePath.lastPathComponent)"
     }
     
     var itemId:String {

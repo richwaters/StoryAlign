@@ -19,7 +19,7 @@ struct MediaOverlay {
 
     var href: String {
         let basename = manifestItem.filePath!.deletingPathExtension().lastPathComponent
-        return "MediaOverlays/\(basename).smil"
+        return "\(AssetPaths.mediaOverlays)/\(basename).smil"
     }
 
     var filePath: URL {
@@ -31,10 +31,16 @@ struct MediaOverlay {
     }
 
     var overlayXml: String {
+        let dots = {
+            let depth = AssetPaths.mediaOverlays.split(separator: "/").count
+            guard depth > 0 else { return "." }
+            return Array(repeating: "..", count: depth).joined(separator: "/")
+        }()
+        
         var xml = """
         <smil xmlns=\"http://www.w3.org/ns/SMIL\" xmlns:epub=\"http://www.idpf.org/2007/ops\" version=\"3.0\">
           <body>
-            <seq id=\"\(itemId)\" epub:textref=\"../\(manifestItem.href)\" epub:type=\"chapter\">
+            <seq id=\"\(itemId)\" epub:textref=\"\(dots)/\(manifestItem.href)\" epub:type=\"chapter\">
         """
 
         for sr in sentenceRanges {
@@ -44,8 +50,8 @@ struct MediaOverlay {
 
             xml += """
               <par id=\"\(sid)\">
-                <text src=\"../\(manifestItem.href)#\(sid)\"/>
-                <audio src=\"../Audio/\(sr.audioFile.filePath.lastPathComponent)\" clipBegin=\"\(clipBegin)\" clipEnd=\"\(clipEnd)\"/>
+                <text src=\"\(dots)/\(manifestItem.href)#\(sid)\"/>
+                <audio src=\"\(dots)/\(AssetPaths.audio)/\(sr.audioFile.filePath.lastPathComponent)\" clipBegin=\"\(clipBegin)\" clipEnd=\"\(clipEnd)\"/>
               </par>
             """
         }
