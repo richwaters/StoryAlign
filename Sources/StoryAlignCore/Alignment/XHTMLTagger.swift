@@ -290,15 +290,15 @@ struct XHTMLTagger {
                 let isBlock        = blocks.contains(lower)
 
                 if childElem.getChildNodes().isEmpty {
+                    let hasText = ((try? !childElem.text().trimmed().isEmpty) == true)
+                    let sentenceId = (isBlock || state.currentSentenceProgress == 0 || (!hasText && taggedSentences.isEmpty)) ? nil : state.currentSentenceIndex
                     try appendLeafNode(
                         chapterId: chapterId,
                         xml: taggedXml,
                         node: childElem,
                         marks: marks,
                         taggedSentences: &taggedSentences,
-                        sentenceId: isBlock || state.currentSentenceProgress == 0
-                        ? nil
-                        : state.currentSentenceIndex
+                        sentenceId: sentenceId
                     )
                     continue
                 }
@@ -420,7 +420,7 @@ extension XHTMLTagger {
         let rootUrl = epub.opfURL.deletingLastPathComponent()
         let manifestUrl = manifestItem.filePath?.deletingLastPathComponent() ?? rootUrl
         let relUrlStr = rootUrl.relative(to: manifestUrl )
-        let styleCss = "Styles/storyalign.css"
+        let styleCss = "\(AssetPaths.styles)/storyalign.css"
         let stylePath = relUrlStr.isEmpty ? styleCss : "\(relUrlStr)/\(styleCss)"
         
         try head.appendElement("link")
