@@ -25,6 +25,12 @@ struct StoryAlignMain {
             exit(0)
         }
         
+        if CommandLine.arguments.contains("--help-md") {
+            //print(StoryAlignHelp.helpText)
+            print( CliUsageFormatter.makeMarkdown(from: StoryAlignHelp.helpText) )
+            exit(0)
+        }
+        
         if CommandLine.arguments.contains("__TEMPLATE_ARGS__") {
             print( "It looks like you launched the Template scheme directly. Please run generate_schemes.sh first so your schemes point at real paths.\n" )
             exit(0)
@@ -70,7 +76,8 @@ struct StoryAlignMain {
             whisperDtw: storyAlignArgs.whisperDtw,
             reportType: storyAlignArgs.reportType ?? .none,
             startChapter: storyAlignArgs.startChapter,
-            endChapter: storyAlignArgs.endChapter
+            endChapter: storyAlignArgs.endChapter,
+            granularity: storyAlignArgs.granularity ?? .sentence
         )
         defer {
             sessionConfig.cleanup()

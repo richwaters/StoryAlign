@@ -31,9 +31,12 @@ struct SfSpeechTranscriber : Transcriber {
                     start: sfSpeechToken.start,
                     end: sfSpeechToken.end,
                     audioFile: transcriptionSegment.audioFile,
-                    voiceLen:-1,
+                    transcriptionTokens: [sfSpeechToken],
+                    //voiceLen:-1,
                     segmentIndex: segIndex,
-                    tokenTypeGuess: .other
+                    tokenTypeGuess: .other,
+                    //timeConfidence: sfSpeechToken.timeConfidence,
+                    //textConfidence: sfSpeechToken.textConfidence
                 )
                 return wordTimeStamp
             }
@@ -114,7 +117,7 @@ extension SfSpeechTranscriber {
                         let tokens = words.enumerated().map { offset, word in
                             let start = timeStep*Double(offset)
                             let end = start + wordDuration
-                            let token = TranscriptionToken(text: word, start: start, end:end, voiceLen:-1, dtw:-1)
+                            let token = TranscriptionToken(text: word, start: start, end:end, voiceLen:-1, dtw:-1, timeConfidence: Double(seg.confidence), textConfidence: Double(seg.confidence))
                             return token
                         }
                         progressUpdater?.updateProgress(for: .transcribe, msgPrefix: "Transcribing audio", increment: seg.duration, total: fullAudioDuration, unit: .seconds)

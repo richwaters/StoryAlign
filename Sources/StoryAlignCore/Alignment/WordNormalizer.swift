@@ -60,7 +60,7 @@ class WordNormalizer {
 
     func normalizedWord(_ word: String) -> (String, Int) {
         let leading  = word.prefix { $0.isWhitespace }
-        let trailingChars = word.reversed().prefix { $0.isPunctuation }
+        let trailingChars = word.reversed().prefix { $0.isPunctuation || $0.isWhitespace }
         let trailing = String(trailingChars.reversed())
         let core = String( word.dropFirst(leading.count).dropLast(trailing.count) )
         
@@ -75,10 +75,54 @@ class WordNormalizer {
             return nil
         }()
         
+        
         guard let i = numberValue else {
+            let parts = core.split(separator: ".", omittingEmptySubsequences: false)
+            let leadsWithDot = parts.first?.isEmpty == true
+            let hasDots = parts.count >= 2
+            let nonEmptyNumeric = parts.dropFirst(leadsWithDot ? 1 : 0).allSatisfy { !$0.isEmpty && $0.allSatisfy(\.isNumber) }
+            let hasInternalEmpties = parts.dropFirst().contains { $0.isEmpty }
+            if hasDots, nonEmptyNumeric, !hasInternalEmpties {
+                func spell(_ s: Substring) -> String {
+                    let key = String(s)
+                    if let cached = spelledNumberCache[key] { return cached }
+                    let val = Int(key)!
+                    let out = numberFormatter.string(from: NSNumber(value: val))!
+                    spelledNumberCache[key] = out
+                    return out
+                }
+                let spelledParts = parts.dropFirst(leadsWithDot ? 1 : 0).map { spell($0) }
+                let body = spelledParts.joined(separator: " point ")
+                let joined = leadsWithDot ? "point \(body)" : body
+                if trailing.contains("%") {
+                    let rest = trailing.replacingOccurrences(of: "%", with: "")
+                    let newWord = "\(leading)\(joined) percent\(rest)"
+                    return (newWord, newWord.count - word.count)
+                }
+                let newWord = "\(leading)\(joined)\(trailing)"
+                return (newWord, newWord.count - word.count)
+            }
+            let afterLeading = word.dropFirst(leading.count)
+            if afterLeading.first == "%", afterLeading.dropFirst().allSatisfy({ $0.isPunctuation }) {
+                let rest = String(afterLeading.dropFirst())
+                let newWord = "\(leading)percent\(rest)"
+                return (newWord, newWord.count - word.count)
+            }
+            let wordWithNormalizedPunct = normalizePunctuation(word)
+            return (wordWithNormalizedPunct, 0)
+        }
+        
+        /*
+        guard let i = numberValue else {
+            let afterLeading = word.dropFirst(leading.count)
+            if afterLeading.first == "%", afterLeading.dropFirst().allSatisfy({ $0.isPunctuation }) {
+                let rest = String(afterLeading.dropFirst())
+                let newWord = "\(leading)percent\(rest)"
+                return (newWord, newWord.count - word.count)
+            }
             let wordWithNormalizedPunct = normalizePunctuation(word)
             return(wordWithNormalizedPunct,0)
-        }
+        }*/
         //if i > 10000 {
         //return (normalizePunctuation(word),0)
         //}
@@ -90,12 +134,26 @@ class WordNormalizer {
             spelledNumberCache[key] = s
             return s
         }()
+        if trailing.contains("%") {
+            let rest = trailing.replacingOccurrences(of: "%", with: "")
+            let newWord = "\(leading)\(spelled) percent\(rest)"
+            return (newWord, newWord.count - word.count)
+        }
+        
         let newWord = "\(leading)\(spelled)\(trailing)"
         return (newWord, newWord.count - word.count)
     }
     
     
     func normalizeWordsInSentence(_ sentence: String) -> String {
+        //let tokens = Tokenizer().tokenize(text: sentence)
+        let tokens = Tokenizer().tokenizeWords(text: sentence)
+        let words = tokens.map {
+            normalizedWord($0).0
+        }
+        let out = words.joined()
+        return out 
+        /*
         let re = try! NSRegularExpression(pattern: #"(\S+)|(\s+)"#)
         let ns = sentence as NSString
         var out = ""
@@ -109,6 +167,7 @@ class WordNormalizer {
             }
         }
         return out
+         */
     }
     
     func isRomanNumeral(_ core:String ) -> Bool {

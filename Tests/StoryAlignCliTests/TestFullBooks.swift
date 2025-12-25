@@ -15,6 +15,7 @@ struct TestConfig : Codable {
     let modelName:String
     let beamSize:Int?
     let expectedSha256:String
+    let granularity:Granularity
 }
 
 struct TestBookInfo : Codable {
@@ -49,12 +50,13 @@ extension FullBookTester {
             let dir = home.appendingPathComponent(".storyalign")
             return dir.appendingPathComponent(modelName).path()
         }()
+        
         let logger =  CliLogger(minimumLevel: .warn)
         let progressUpdater = CliProgressUpdater()
         
         let sessionDir:String? = nil
         let audioLoaderType:AudioLoaderType = .avfoundation
-        let sessionConfig = try SessionConfig(sessionDir: sessionDir, modelFile: model, runStage: nil, logger:logger, audioLoaderType: audioLoaderType, progressUpdater: progressUpdater, reportType: .full)
+        let sessionConfig = try SessionConfig(sessionDir: sessionDir, modelFile: model, runStage: nil, logger:logger, audioLoaderType: audioLoaderType, progressUpdater: progressUpdater, reportType: .full, granularity: testConfig.granularity)
         return sessionConfig
     }
     
@@ -74,7 +76,8 @@ extension FullBookTester {
         let sessionConfig = try buildSessionConfig( with: testConfig)
         
         let shortModelName = testConfig.modelName.replacingOccurrences(of: ".bin", with: "").replacingOccurrences(of: "ggml-", with: "")
-        let sfx = "_narrated_\(shortModelName)"
+        let granSfx = sessionConfig.granularity == .sentence ? "" : "_\(sessionConfig.granularity!.rawValue)"
+        let sfx = "_narrated_\(shortModelName)\(granSfx)"
 
         let fm = FileManager.default
         let epubPath = URL(fileURLWithPath: "\(testBookDir)/\(bookName)/\(bookName).epub")

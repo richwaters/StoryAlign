@@ -35,6 +35,7 @@ public final class SessionConfig : Sendable {
     public let reportType:ReportType
     public let startChapter:String?
     public let endChapter:String?
+    public let granularity:Granularity?
 
     var modelName:String {
         URL(fileURLWithPath: modelFile).deletingPathExtension().lastPathComponent
@@ -55,6 +56,7 @@ public final class SessionConfig : Sendable {
                 reportType:ReportType = .none,
                 startChapter:String? = nil,
                 endChapter:String? = nil,
+                granularity:Granularity? = .sentence
     ) throws {
         self.runStage = runStage ?? .all
         self.modelFile = modelFile
@@ -68,6 +70,7 @@ public final class SessionConfig : Sendable {
         self.reportType = reportType
         self.startChapter = startChapter
         self.endChapter = endChapter
+        self.granularity = granularity
         
         self.whisperBeamSize = {
             if let beamSize = whisperBeamSize {

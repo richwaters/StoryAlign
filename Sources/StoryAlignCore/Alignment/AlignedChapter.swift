@@ -13,17 +13,20 @@ public struct AlignedChapter : Codable,Sendable {
     let transcriptionEndOffset: Int?
     
     let alignedSentences:[AlignedSentence]
+    let alignedWords:[AlignedSentence]
+
     let skippedSentences:[SkippedSentence]
     public let rebuiltSentences:[AlignedSentence]
     
     
-    init(manifestItem: EpubManifestItem, transcriptionStartOffset: Int? = nil, transcriptionEndOffset: Int? = nil, alignedSentences: [AlignedSentence]=[], skippedSentences:[SkippedSentence]=[], rebuiltSentences: [AlignedSentence] = []) {
+    init(manifestItem: EpubManifestItem, transcriptionStartOffset: Int? = nil, transcriptionEndOffset: Int? = nil, alignedSentences: [AlignedSentence]=[], skippedSentences:[SkippedSentence]=[], rebuiltSentences: [AlignedSentence] = [], alignedWords:[AlignedSentence] = [] ) {
         self.manifestItem = manifestItem
         self.transcriptionStartOffset = transcriptionStartOffset
         self.transcriptionEndOffset = transcriptionEndOffset
         self.alignedSentences = alignedSentences
         self.skippedSentences = skippedSentences
         self.rebuiltSentences = rebuiltSentences
+        self.alignedWords = alignedWords
     }
 
     var isEmpty:Bool {
@@ -34,7 +37,11 @@ public struct AlignedChapter : Codable,Sendable {
         alignedSentences.map { $0.sentenceRange }
     }
     
-    func with(manifestItem: EpubManifestItem? = nil,  transcriptionStartOffset: Int? = nil, transcriptionEndOffset: Int? = nil, alignedSentences: [AlignedSentence]? = nil, skippedSentences: [SkippedSentence]? = nil, rebuiltSentences:[AlignedSentence]?=nil) -> AlignedChapter {
+    var alignedSentencesWordCount:Int {
+        alignedSentences.reduce(0) { $0 + $1.xhtmlSentenceWords.count }
+    }
+    
+    func with(manifestItem: EpubManifestItem? = nil,  transcriptionStartOffset: Int? = nil, transcriptionEndOffset: Int? = nil, alignedSentences: [AlignedSentence]? = nil, skippedSentences: [SkippedSentence]? = nil, rebuiltSentences:[AlignedSentence]?=nil, alignedWords: [AlignedSentence]? = nil ) -> AlignedChapter {
         
         return AlignedChapter(
             manifestItem:manifestItem ?? self.manifestItem,
@@ -42,7 +49,9 @@ public struct AlignedChapter : Codable,Sendable {
             transcriptionEndOffset: transcriptionEndOffset ?? self.transcriptionEndOffset,
             alignedSentences: alignedSentences ?? self.alignedSentences,
             skippedSentences: skippedSentences ?? self.skippedSentences,
-            rebuiltSentences: rebuiltSentences ?? self.rebuiltSentences
+            rebuiltSentences: rebuiltSentences ?? self.rebuiltSentences,
+            alignedWords: alignedWords ?? self.alignedWords
+
         )
     }
 }
@@ -51,7 +60,7 @@ extension AlignedChapter {
     var missingSentences:[String] {
         let chapterSentences = manifestItem.xhtmlSentences
         let skippedSentenceIds = Set(skippedSentences.map { $0.chapterSentenceId } )
-        let alignedSentenceIds = Set( alignedSentences.map { $0.chapterSentenceId} )
+        let alignedSentenceIds = Set( alignedSentences.map { $0.sentenceId} )
         let missingSentences = chapterSentences.enumerated().compactMap { (index,sentence) -> String? in
             if alignedSentenceIds.contains(index) {
                 return nil
@@ -75,7 +84,7 @@ extension AlignedChapter {
         guard alignedSentences.count > 0 else {
             return []
         }
-        return alignedSentences.filter { $0.chapterSentenceId != 0 && $0.chapterSentenceId != (manifestItem.xhtmlSentences.count-1) }
+        return alignedSentences.filter { $0.sentenceId != 0 && $0.sentenceId != (manifestItem.xhtmlSentences.count-1) }
     }
 }
 

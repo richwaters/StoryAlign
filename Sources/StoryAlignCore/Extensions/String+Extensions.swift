@@ -10,6 +10,13 @@ import Foundation
 
 public extension String {
     
+    func contains(anyOf needles: [String], options: String.CompareOptions = []) -> Bool {
+        if self.isEmpty || needles.isEmpty {
+            return false
+        }
+        return needles.contains { self.range(of: $0, options: options) != nil }
+    }
+    
     // Can't use trim as name becuase it conflicts with SwiftSoup
     func trimmed() -> String {
         return trimmingCharacters(in: .whitespacesAndNewlines)
@@ -24,6 +31,9 @@ public extension String {
     }
     func removeNewlnes() -> String {
         return replacingOccurrences(of: "\n", with: "")
+    }
+    func removePunctuation() -> String {
+        components(separatedBy: .punctuationCharacters).joined()
     }
     
     func collapseWhiteSpace() -> String {

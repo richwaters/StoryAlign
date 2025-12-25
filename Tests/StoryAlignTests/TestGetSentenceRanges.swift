@@ -114,9 +114,7 @@ final class TestGetSentenceRanges: XCTestCase {
         let (sentenceRanges,_ , _) = aligner.getSentenceRanges(startSentence: 0, transcription: transcription, sentences: sentences, chapterOffset: 0, lastSentenceRange: nil)
         
         let refined = aligner.refine(sentenceRanges: sentenceRanges, lastSentenceRange: nil, transcription: transcription)
-        
-        print( "dd" )
-        
+                
     }
 
 }
@@ -183,6 +181,23 @@ final class TestRangeMatch: XCTestCase {
         //[DEBUG] [07:31:39.670] Found match at index:7: type:ignoringAllPunctuation: query:that’s you.” haystack:. see? that's you.  queryLen:12 matchLen:10 match: ignoringAllPunctuation
         
         do {
+            let query = "you know that,"
+            let haystack = "you'll know that."
+            let matchedRange = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query)
+            let matched = String(haystack[matchedRange!])
+            XCTAssertTrue(matched.count == 17)
+        }
+
+        
+        do {
+            let query = "\"which is the first way in which it's not like america,\" malik said, dryly."
+            let haystack = "which is the first way in which it's not, like, america. malik said, \"dryly.\" \"it's within an order of magnitude,\" tori said. "
+            let matchedRange = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query)
+            let matched = String(haystack[matchedRange!])
+            XCTAssertTrue(matched.count == 78)
+        }
+        
+        do {
             let query = "that’s you.”"
             let haystack = ". see? that's you."
             let match = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query)
@@ -205,7 +220,10 @@ final class TestRangeMatch: XCTestCase {
             let query = "see? that’s you.”"
             let haystack = ". see - that's you."
             let match = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query)
-            XCTAssertTrue(match == nil) // extra space causes fail. maybe change behaviour someday
+            let offset = haystack.distance(from: haystack.startIndex, to: match!.lowerBound)
+            let matchStr = String( haystack[match!] )
+            XCTAssertTrue(offset == 2)
+            XCTAssertEqual(matchStr, "see - that's you.")
         }
         
         do {
@@ -225,7 +243,8 @@ final class TestRangeMatch: XCTestCase {
             if let match = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query) {
                 let offset = haystack.distance(from: haystack.startIndex, to: match.lowerBound)
                 let len = haystack.distance(from: match.lowerBound, to: match.upperBound)
-                XCTAssertTrue( offset == 2 && len == 16 )
+                //XCTAssertTrue( offset == 2 && len == 16 )
+                XCTAssertTrue( offset == 2 && len == 17 )
             }
             else {
                 XCTFail()
@@ -252,7 +271,8 @@ final class TestRangeMatch: XCTestCase {
                 let offset = haystack.distance(from: haystack.startIndex, to: match.lowerBound)
                 let len = haystack.distance(from: match.lowerBound, to: match.upperBound)
                 // Not sure what to do with this one. Should it fail?
-                XCTAssertTrue( offset == 0 && len == 15 )
+                //XCTAssertTrue( offset == 0 && len == 15 )
+                XCTAssertTrue( offset == 0 && len == 18 )
             }
             else {
                 XCTFail()
@@ -265,7 +285,8 @@ final class TestRangeMatch: XCTestCase {
             if let match = aligner.rangeExactMatchIgnoringAllPunctuation(in: haystack, query: query) {
                 let offset = haystack.distance(from: haystack.startIndex, to: match.lowerBound)
                 let len = haystack.distance(from: match.lowerBound, to: match.upperBound)
-                XCTAssertTrue( offset == 2 && len == 16 )
+                //XCTAssertTrue( offset == 2 && len == 16 )
+                XCTAssertTrue( offset == 2 && len == 17 )
             }
             else {
                 XCTFail()
@@ -321,6 +342,3 @@ final class TestRangeMatch: XCTestCase {
     }
 
 }
-
-
-

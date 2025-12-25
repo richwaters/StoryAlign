@@ -1,49 +1,23 @@
 {
   "alignmentStats" : {
     "chapterSentenceCount" : 1298,
-    "exactMatches" : 16,
+    "exactMatches" : 11,
     "interpolated" : 5,
-    "matchesIgnoringAllPunctuation" : 281,
+    "matchesIgnoringAllPunctuation" : 273,
     "matchesIgnoringEndsPunctuation" : 122,
     "missedChapterSentences" : 3,
     "missedChapters" : 1,
-    "nearMatchs" : 643,
-    "recoverable" : 18,
-    "skipped" : 27,
-    "trimmedLeadingMatches" : 210
+    "nearMatchs" : 645,
+    "recoverable" : 22,
+    "skipped" : 26,
+    "smilSpans" : 1295,
+    "trimmedLeadingMatches" : 217,
+    "wordCount" : 32078
   },
   "audioPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2.m4b",
   "beamSize" : 7,
   "epubPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2.epub",
   "fastPaceSentences" : [
-    {
-      "chapterId" : "chapter-11.xhtml",
-      "chapterName" : "XI: Concerning Our Priests",
-      "sentences" : [
-        {
-          "chapterSentence" : "It is high time that I should pass from these brief and discursive notes about things in Flatland to the central event of this book, my initiation into the mysteries of Space.",
-          "chapterSentenceId" : 2,
-          "duration" : 4.920999999999999,
-          "pace" : 0.15378124999999998,
-          "transcriptionSentence" : " My initiation into the mysteries of space.",
-          "zscore" : -3.375465871049093
-        }
-      ]
-    },
-    {
-      "chapterId" : "chapter-12.xhtml",
-      "chapterName" : "XII: Of the Doctrine of Our Prie",
-      "sentences" : [
-        {
-          "chapterSentence" : "Now my humble fear is that this double training, in language as well as in thought, imposes somewhat too heavy a burden upon the young, especially when, at the age of three years old, they are taken from the maternal care and taught to unlearn the old language⁠—except for the purpose of repeating it in the presence of their mothers and nurses⁠—and to learn the vocabulary and idiom of science.",
-          "chapterSentenceId" : 39,
-          "duration" : 27.67999999999995,
-          "pace" : 0.39542857142857074,
-          "transcriptionSentence" : " Now my humble fear is that this double training in language as well as in thought , imposes somewhat too heavy a burden upon the young , especially when , at the age of three years old , they are taken from the maternal care and taught to unlearn the old language , except for the purpose of repeating it in the presence of the mothers and nurses , and to learn the vocabulary and idiom of science.",
-          "zscore" : -3.4090519949836158
-        }
-      ]
-    },
     {
       "chapterId" : "chapter-14.xhtml",
       "chapterName" : "XIV: How I Vainly Tried to Expla",
@@ -54,7 +28,7 @@
           "duration" : 24.980000000000018,
           "pace" : 0.4233898305084749,
           "transcriptionSentence" : " The frail form of a woman being liable to be shattered by such an approximation must be preserved by by the state ; but since women cannot be distinguished by the sense of sight from men , below ordained universally , that neither man nor woman shall be approached so closely as to destroy the interval between the approximator and the approximated.",
-          "zscore" : -3.756309788725462
+          "zscore" : -3.784281791430195
         }
       ]
     },
@@ -63,12 +37,12 @@
       "chapterName" : "XV: Concerning a Stranger from S",
       "sentences" : [
         {
-          "chapterSentence" : "Then he added more mildly, \"I have a message, dear Madam, to your husband, which I must not deliver in your presence; and, if you would suffer us to retire for a few minutes⁠—\" But my wife would not listen to the proposal that our august visitor should so incommode himself, and assuring the Circle that the hour of her own retirement had long passed, with many reiterated apologies for her recent indiscretion, she at last retreated to her apartment.",
+          "chapterSentence" : "Then he added more mildly, “I have a message, dear Madam, to your husband, which I must not deliver in your presence; and, if you would suffer us to retire for a few minutes⁠—” But my wife would not listen to the proposal that our august visitor should so incommode himself, and assuring the Circle that the hour of her own retirement had long passed, with many reiterated apologies for her recent indiscretion, she at last retreated to her apartment.",
           "chapterSentenceId" : 42,
           "duration" : 29.875,
           "pace" : 0.3734375,
           "transcriptionSentence" : " Then he added more mildly , \" I have a message , dear madam , to your husband , which I must not deliver in your presence , and if you would suffer us to retire for a few minutes ? But my wife would not listen to the proposal that our august visitor should sow in commode himself , and assuring the circle that the hour of her own retirement had long passed , with many reiterated apologies for her recent indiscretion she had last retreated to her apartment.",
-          "zscore" : -7.431096813531884
+          "zscore" : -10.447630455107198
         }
       ]
     },
@@ -77,12 +51,12 @@
       "chapterName" : "XVII: How the Sphere, Having in ",
       "sentences" : [
         {
-          "chapterSentence" : "For example, I am ascending; now I can see your neighbour the Hexagon and his family in their several apartments; now I see the inside of the Theatre, ten doors off, from which the audience is only just departing; and on the other side a Circle in his study, sitting at his books.",
+          "chapterSentence" : "For example, I am ascending; now I can see your neighbour the Hexagon and his family in their several apartments; now I see the inside of the Theatre, ten doors off, from which the audience is only just departing; and on the other side a Circle in his study, sitting at his books. ",
           "chapterSentenceId" : 31,
           "duration" : 16.414999999999992,
           "pace" : 0.3097169811320753,
           "transcriptionSentence" : " For example , I am ascending , now I can see your neighbor the hexagon and his family in their several apartments , now I see the inside of the theater , ten doors off from which the audience is only just departing , and on the other side a circle in his study sitting at his books.",
-          "zscore" : -4.807061810600583
+          "zscore" : -3.93826210752324
         }
       ]
     },
@@ -96,7 +70,7 @@
           "duration" : 26.43999999999994,
           "pace" : 0.362191780821917,
           "transcriptionSentence" : " What therefore more easy than now to take a servant on a second journey into the blessed region of the fourth dimension , where I shall look down with him once more upon this This land of three dimensions and see the inside of every three dimensioned house. The secrets of the solid earth , the treasures , the minds of space-land , and the intestines of every solid living creature , even the noble and adorable spheres...sphere.",
-          "zscore" : -4.469216860640897
+          "zscore" : -4.520545787829234
         }
       ]
     },
@@ -108,23 +82,9 @@
           "chapterSentence" : "Discussing the matter with him, a mere boy, I should be in perfect safety; for he would know nothing of the Proclamation of the Council; whereas I could not feel sure that my sons⁠—so greatly did their patriotism and reverence for the Circles predominate over mere blind affection⁠—might not feel compelled to hand me over to the Prefect, if they found me seriously maintaining the seditious heresy of the Third Dimension.",
           "chapterSentenceId" : 19,
           "duration" : 26.319999999999993,
-          "pace" : 0.37070422535211256,
+          "pace" : 0.36054794520547934,
           "transcriptionSentence" : " Discussing the matter with him a mere boy I should be in perfect safety for he would know nothing of the proclamation of the council , whereas I could not feel sure that my sons , so greatly did their patriotism and reverence for the circles predominate over mere blind affection , might not feel compelled to hand me over to the prefect if they found me seriously maintaining the seditious heresy of the third dimension.",
-          "zscore" : -3.3687747481040247
-        }
-      ]
-    },
-    {
-      "chapterId" : "chapter-22.xhtml",
-      "chapterName" : "XXII: How I Then Tried to Diffus",
-      "sentences" : [
-        {
-          "chapterSentence" : "Only, with the view of evading the law, if possible, I spoke not of a physical Dimension, but of a Thoughtland whence, in theory, a Figure could look down upon Flatland and see simultaneously the insides of all things, and where it was possible that there might be supposed to exist a Figure environed, as it were, with six Squares, and containing eight terminal Points.",
-          "chapterSentenceId" : 5,
-          "duration" : 25.119999999999997,
-          "pace" : 0.3864615384615384,
-          "transcriptionSentence" : " Only , with the view of evading the law , if possible , I spoke not of a physical dimension , but of a thought land , whence , in theory , a figure could look down upon flatland and see simultaneously the insides of all things , and where it was possible that there might be supposed to exist , a figure invariant as it were with six squares and containing eight terminal points.",
-          "zscore" : -3.5409183974918936
+          "zscore" : -3.333310540425885
         }
       ]
     }
@@ -143,7 +103,7 @@
     }
   ],
   "modelName" : "ggml-tiny.en",
-  "osVersion" : "26.0.1",
+  "osVersion" : "macOS 26.1",
   "outputPath" : "file:.\/Tests\/TestBooks\/Flatland2\/Flatland2_narrated_tiny.en.epub",
   "rebuiltSentences" : [
     {
@@ -178,45 +138,45 @@
       "chapterName" : "XXI: How I Tried to Teach the Th",
       "sentences" : [
         {
-          "chapterSentence" : "How silly it is!",
+          "chapterSentence" : "How silly it is! ",
           "chapterSentenceId" : 36,
-          "duration" : 1.1580000000000155,
-          "pace" : 0.28950000000000387,
+          "duration" : 1.1589999999999918,
+          "pace" : 0.28974999999999795,
           "transcriptionSentence" : " how silly it is."
         },
         {
-          "chapterSentence" : "Ha!",
+          "chapterSentence" : "Ha! ",
           "chapterSentenceId" : 37,
           "duration" : 0.3860000000000241,
           "pace" : 0.3860000000000241,
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
         },
         {
-          "chapterSentence" : "ha!",
+          "chapterSentence" : "ha! ",
           "chapterSentenceId" : 38,
-          "duration" : 0.38599999999996726,
-          "pace" : 0.38599999999996726,
+          "duration" : 0.38700000000000045,
+          "pace" : 0.38700000000000045,
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
         },
         {
-          "chapterSentence" : "ha!\"",
+          "chapterSentence" : "ha!”",
           "chapterSentenceId" : 39,
           "duration" : 0.4630000000000223,
           "pace" : 0.4630000000000223,
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
         },
         {
-          "chapterSentence" : "\"Not at all silly,\" said I, losing my temper; \"here for example, I take this Square,\" and, at the word, I grasped a moveable Square, which was lying at hand⁠—\"and I move it, you see, not Northward but⁠—yes, I move it Upward⁠—that is to say, not Northward, but I move it somewhere⁠—not exactly like this, but somehow⁠—\" Here I brought my sentence to an inane conclusion, shaking the Square about in a purposeless manner, much to the amusement of my grandson, who burst out laughing louder than ever, and declared that I was not teaching him, but joking with him; and so saying he unlocked the door and ran out of the room.",
+          "chapterSentence" : "“Not at all silly,” said I, losing my temper; “here for example, I take this Square,” and, at the word, I grasped a moveable Square, which was lying at hand⁠—“and I move it, you see, not Northward but⁠—yes, I move it Upward⁠—that is to say, not Northward, but I move it somewhere⁠—not exactly like this, but somehow⁠—” Here I brought my sentence to an inane conclusion, shaking the Square about in a purposeless manner, much to the amusement of my grandson, who burst out laughing louder than ever, and declared that I was not teaching him, but joking with him; and so saying he unlocked the door and ran out of the room. ",
           "chapterSentenceId" : 40,
-          "duration" : 40.822,
-          "pace" : 0.3612566371681416,
+          "duration" : 40.81999999999999,
+          "pace" : 0.3488888888888888,
           "transcriptionSentence" : " Not at all silly , I said , losing my temper. Here , for example , I take this square , and at the word I grasped a movable square , which was lying at hand. And I move it , you see , not northward , but yes , I move it upward , that It is to say northward , but I move it somewhere , not exactly like this , but somehow , here I brought my sentence to an inane conclusion , shaking the square about in a purposeless manner , much to the amusement of my grandson , who burst out laughing louder than ever , and declared that I was not teaching him , but joking with him , and so saying he unlocked the door and ran out of the room."
         }
       ]
     }
   ],
-  "runtime" : 131.82712316513062,
-  "score" : 98.3,
+  "runtime" : 127.34384286403656,
+  "score" : 98.56,
   "shortDurationSentences" : [
 
   ],
@@ -226,55 +186,47 @@
       "chapterName" : "XV: Concerning a Stranger from S",
       "sentences" : [
         {
-          "chapterSentence" : "Concerning a Stranger from Spaceland",
-          "chapterSentenceId" : 1,
-          "duration" : 12.96,
-          "pace" : 2.592,
-          "transcriptionSentence" : " concerning a stranger from spaceland.",
-          "zscore" : 11.576183130698862
-        },
-        {
           "chapterSentence" : "My four sons and two orphan Grandchildren had retired to their several apartments; and my wife alone remained with me to see the old Millennium out and the new one in.",
           "chapterSentenceId" : 5,
           "duration" : 49.72,
           "pace" : 1.6038709677419354,
           "transcriptionSentence" : " My four sons , and two orphan grandchildren , had retired to their several apartments , and my wife alone remained with me to see the old millennium out , and the new one in.",
-          "zscore" : 18.337184284567847
+          "zscore" : 19.76580146567019
         }
       ]
     }
   ],
   "stageRunTimes" : {
     "align" : [
-      783795573.288749,
-      783795649.474599
+      788370940.576297,
+      788371012.476015
     ],
     "audio" : [
-      783795521.615277,
-      783795522.716626
+      788370889.306591,
+      788370890.261326
     ],
     "epub" : [
-      783795521.064625,
-      783795521.615244
+      788370888.748673,
+      788370889.306561
     ],
     "export" : [
-      783795649.938162,
-      783795652.891824
+      788371013.144479,
+      788371016.092584
     ],
     "report" : [
-      783795652.89184,
-      783795652.97995
+      788371016.092613,
+      788371016.646246
     ],
     "transcribe" : [
-      783795522.716637,
-      783795573.288737
+      788370890.261334,
+      788370940.576288
     ],
     "xml" : [
-      783795649.47461,
-      783795649.938152
+      788371012.476025,
+      788371013.144468
     ]
   },
-  "toolTitle" : "storyalign 0.12-dev",
+  "toolTitle" : "storyalign 0.99.5-dev",
   "transcriptionStats" : {
     "averagePace" : 0.45408347513596786,
     "avgSecsPerVoiceLen" : 0.09938534653868035,

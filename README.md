@@ -37,36 +37,55 @@ That places the binary into the bin subdirectory. From there, you can cp ./bin/s
 location in your PATH or run it in place.
 
 
-## Usage
-
-storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<file\>\] \[--log-level=(debug|info|timestamp|warn|error)\] \[--no-progress\] \[--throttle\]  \[--audio-loader=(avfoundation|ffmpeg)\] \[--report=(none|score|stats|full|json)\] \[--whisper-beam-size=\<number\>\] \[--whisper-dtw\] \[--session-dir=\<directory\>\] \[--stage=(epub|audio|transcribe|align|xml|export|report|all)\] \<ebook\> \<audiobook\>
+## Usage:
+  storyalign \[--outfile=\<file\>\] \[--granularity=(sentence|phrase|segment|group|word)\] \[--whisper-model=\<file\>\] \[--audio-loader=(avfoundation|ffmpeg)\] \[--log-level=(debug|info|timestamp|warn|error)\] \[--no-progress\] \[--throttle\] \[--start-chapter=\<chapter name\>\] \[--end-chapter=\<chapter name\>\] \[--report=(none|score|stats|full|json)\] \[--whisper-beam-size=\<number\>\] \[--whisper-dtw\] \[--session-dir=\<directory\>\] \[--stage=(epub|audio|transcribe|align|xml|export|report|all)\] \[--help\] \[--version\] \[--help-md\] \<ebook\> \<audiobook\>
 
 ### Arguments:
-  \<ebook\>        The input ebook file (in .epub format)
+  \<ebook\>         The input ebook file (in .epub format)
 
   \<audiobook\>    The input audiobook file (in .m4b format).
 
 ### Options:
-
-**--outfile** <file>
-      Set the file in which to save the aligned book. Defaults to the
-      name and path of the input  file with '\_narrated' appended to the
-      basename of that file.
-
-**--whisper-model** <file>
-      The whisper model file. This is a 'ggml' file compatible with
-      the whisper.cpp library. The 'ggml-tiny.en.bin' model is appropriate
-      and best for most cases. If this option is not specified,
-      storyalign will download and install the model after prompting for
-      confirmation. If you do specify a model file, make sure the companion
-      .mlmodelc files are installed in the same location as the specified .bin
+**--outfile**=\<file\>
+      Set the file in which to save the aligned book. Defaults to the name and
+      path of the input file with '\_narrated' appended to the basename of that
       file.
 
+**--granularity**=(sentence|phrase|segment|group|word)
+      Sets the unit for the synchronized highlighting during narration. The
+      default is 'sentence', which creates the most accurate alignment and
+      fewest highlight updates. The 'phrase' option breaks the sentence into
+      smaller chunks for more frequent updates, so the highlight is less
+      likely to be left on the previous page while audio continues. The
+      'segment' option relies on the transcription engine to break up the text
+      within sentences. This ends up working like the 'phrase' option, but can
+      be more attuned to audio timing than the semantics used by the 'phrase'
+      option. The 'group' option moves the highlight with each word or small
+      group of words based on timing. This reduces the page-stuck time while
+      keeping things relatively smooth & accurate. The 'word' option moves the
+      highlight with each individual word, which can feel a little choppy.
+
+**--whisper-model** \<file\>
+      The whisper model file. This is a 'ggml' file compatible with the
+      whisper.cpp library. The 'ggml-tiny.en.bin' model is appropriate and
+      best for most cases. If this option is not specified, storyalign will
+      download and install the model after prompting for confirmation. If you
+      do specify a model file, make sure the companion .mlmodelc files are
+      installed in the same location as the specified .bin file.
+
+**--audio-loader**=(avfoundation|ffmpeg)
+      Selects the audio-loading engine. The default is 'avfoundation',
+      which uses Apple's builtin frameworks to load and decode audio. In
+      most cases this should work fine. The 'ffmpeg' option uses the
+      FFmpeg command-line utility to load and decode audio. This might be
+      helpful if you encounter issues with the default. To make use of
+      it, you must have ffmpeg installed on your system and in your path.
+
 **--log-level**=(debug|info|timestamp|warn|error)
-      Set the level of logging output. Defaults to 'warn'. Set to
-      'error' to only report errors. If set to anything above 'warn',
-      either redirect stderr (where these messages are sent) or use
-      the --no-progress flag to prevent conflicts.
+      Set the level of logging output. Defaults to 'warn'. Set to 'error' to
+      only report errors. If set to anything above 'warn', either redirect
+      stderr (where these messages are sent) or use the --no-progress flag to
+      prevent conflicts.
 
 **--no-progress**
       Suppress progress updates.
@@ -77,37 +96,22 @@ storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<f
       device pretty hard. Use this option to pare back on that. Aligning
       the book will take longer, but it'll keep the fans off.
 
-**--audio-loader** (avfoundation|ffmpeg)
-      Selects the audio-loading engine. The default is 'avfoundation',
-      which uses Apple's builtin frameworks to load and decode audio. In
-      most cases this should work fine. The 'ffmpeg' option uses the
-      FFmpeg command-line utility to load and decode audio. This might be
-      helpful if you encounter issues with the default. To make use of
-      it, you must have ffmpeg installed on your system and in your path.
-
-**--start-chapter**=<chapter name>
-      Specify the first chapter to align. This helps storyalign by 
-      allowing it to skip over chapters like the table of contents, 
+**--start-chapter**=\<chapter name\>
+      Specify the first chapter to align. This helps storyalign by
+      allowing it to skip over chapters like the table of contents,
       forewords, etc. that are not in the audiobook. To some extent, this
       the epub itself provides this information in the form of a 'bodymatter'
       tag, but that is not always the case, and it often doesn't align with
-      the true start of the audiobook. 
-    
-**--end-chapter**=<chapter name>
-      Specify the end chapter of the book, where 'end' meand the chapter
-      after the last chapted to align. This helps storyalign avoid attempting
-      the alignment of chapters like afterwords, acknowledgements, next reads, etc.
-      Some books provide a 'backmatter' tag that provide this type of information, 
-      but others do not.
-      
+      the true start of the audiobook.
 
-**--version**
-      Show version information
+**--end-chapter**=\<chapter name\>
+      Specify the end chapter of the book, where 'end' means the chapter after
+      the last chapter to align. This helps storyalign avoid attempting the
+      alignment of chapters like afterwords, acknowledgements, next reads,
+      etc. Some books provide a 'backmatter' tag that provides this type of
+      information, but others do not.
 
-**-h**, **--help**
-      Show help information.
-
-=====
+─────
 
 ### Development Options:
   These options are useful for debugging and testing, but they usually
@@ -120,7 +124,7 @@ storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<f
       options show more detailed information about what was aligned.
       The default is 'none'.
 
-**--whisper-beam-size** <number (1-8)>
+**--whisper-beam-size**=\<number (1-8)\>
       Set the number of paths explored by whisper.cpp when looking for
       the best transcription. Higher values will consider more options. That
       doesn't necessarily mean more accuracy. In fact, it's a bit
@@ -129,21 +133,34 @@ storyalign \[--help\] \[--version\] \[--outfile=\<file\>\] \[--whisper-model=\<f
       all other models.
 
 **--whisper-dtw**
-      Enable the dynamic time warping experimental feature for whisper.cpp and
-      the experimental handling of that information in storyalign. This
+      Enable the dynamic time warping experimental feature for whisper.cpp
+      and the experimental handling of that information in storyalign. This
       might improve accuracy of the timing of the transcription.
 
-**--session-dir** <directory>
+**--session-dir**=\<directory\>
       Set the directory used for session data. It is required when --stage
       is specified, and it tells storyalign where to store both temporary
       and persisted data.
 
-**--stage** (epub|audio|transcribe|align|xml|export|report|all)
-      The processing stage to be run. When set, storyalign expects to find 
+**--stage**=(epub|audio|transcribe|align|xml|export|report|all)
+      The processing stage to be run. When set, storyalign expects to find
       intermediate files stored in the directory pointed to by the session-dir
       argument. It will re-generate missing information required to run
       the specified stage.
 
+─────
+
+### Special Options:
+**-h**, **--help**
+      Show this help information.
+
+**--version**
+      Show version information
+
+**--help-md**
+      Show the help text in markdown format. This can then be pasted into the
+      README.md.
+      
 
 ## Models & Transcriptions
 storyalign uses the 'whisper.cpp' for transcription of the audiobook. That project can be found at: https://github.com/ggml-org/whisper.cpp. By default, storyalign uses the tiny.en model which it downloads and installs under a .storyalign directory in the user's home folder. Other models can be downloaded from https://huggingface.co/ggerganov/whisper.cpp/tree/main. For best results, and to avoid a bunch of warnings, **the companion .mlmodelc.zip file should be downloaded and installed in the same directory as the .bin model**. 
@@ -157,7 +174,6 @@ That said, the quality of the narrated epub is mostly dependent on the quality o
 The --report option can be used to tell storyalign to produce a report about how well it thinks the alignment worked. This includes a score that is based on the percentage of sentences that it thinks were aligned correctly. This should usually be over 98 or 99%, but it can be less, especially for shorter books. This is due to the fact that some portions of the book like acknowledgements, about the author, etc. might not appear in the audio at all. For smaller books those sections are a larger percentage of the total book, which causes a lower overall score. Proper epubs will have 'bodymatter' and 'backmatter' attributes that point to the actual content of the book, but use of 'backmatter' is still spotty.
 
 The storyalign reporting uses various mechanisms to determine if a sentence might be misaligned, but the main surefire indicator is if a sentence is too fast. That said, the current version of the reports still produces a lot of false positives. 
-
 
 
 ## Epub Readers
@@ -202,8 +218,6 @@ Usage is: mkExpected.sh \<book name (no extension)\>
 It's helpful to debug the tool by running the different stages. To accomplish that, an Xcode scheme is used for each separate run stage. The generate_schemes_for_book.sh tool is used to generate the schemes from a template. This is a lot easier than using the Xcode scheme editor to add arguments, environment, etc. for each scheme. Basically, you can set all of the arguments for all of the schemes with a simple command. The basename of the epub file and the audio file must match for the script to work.
 
 Usage is: generate_schemes_for_book.sh \<options\> \<epub file\>
-
-
 
 
 ## Contributing

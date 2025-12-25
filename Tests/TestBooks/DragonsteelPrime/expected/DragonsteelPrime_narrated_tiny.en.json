@@ -1,16 +1,18 @@
 {
   "alignmentStats" : {
     "chapterSentenceCount" : 19780,
-    "exactMatches" : 101,
-    "interpolated" : 11,
-    "matchesIgnoringAllPunctuation" : 2431,
-    "matchesIgnoringEndsPunctuation" : 1894,
+    "exactMatches" : 46,
+    "interpolated" : 10,
+    "matchesIgnoringAllPunctuation" : 2679,
+    "matchesIgnoringEndsPunctuation" : 1896,
     "missedChapterSentences" : 0,
     "missedChapters" : 0,
-    "nearMatchs" : 10447,
-    "recoverable" : 322,
-    "skipped" : 323,
-    "trimmedLeadingMatches" : 4574
+    "nearMatchs" : 10161,
+    "recoverable" : 329,
+    "skipped" : 329,
+    "smilSpans" : 19780,
+    "trimmedLeadingMatches" : 4659,
+    "wordCount" : 236988
   },
   "audioPath" : "file:.\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime.m4b",
   "beamSize" : 7,
@@ -21,12 +23,12 @@
       "chapterName" : "Chapter 2",
       "sentences" : [
         {
-          "chapterSentence" : "Master asked indignantly.",
+          "chapterSentence" : "Master asked indignantly. ",
           "chapterSentenceId" : 363,
           "duration" : 0.19000000000005457,
           "pace" : 0.06333333333335152,
           "transcriptionSentence" : " Master asked indignantly ,",
-          "zscore" : -3.822596453781851
+          "zscore" : -3.844069052569752
         }
       ]
     },
@@ -40,35 +42,7 @@
           "duration" : 0.187,
           "pace" : 0.0935,
           "transcriptionSentence" : " \"",
-          "zscore" : -3.060978118848411
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch10.xhtml",
-      "chapterName" : "Chapter 10",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"And everyone says Ke'Chan are supposed to be tough,\" he said, his eyes focused as he drew some lines around Bat'Chor's eyes with a small piece of charcoal.",
-          "chapterSentenceId" : 18,
-          "duration" : 4.839999999999989,
-          "pace" : 0.17285714285714246,
-          "transcriptionSentence" : " and everyone says ,",
-          "zscore" : -3.7736141561502325
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch12.xhtml",
-      "chapterName" : "Chapter 12",
-      "sentences" : [
-        {
-          "chapterSentence" : "He arrived in time to see three white-vested guards ducking under the partially opened door.",
-          "chapterSentenceId" : 186,
-          "duration" : 2.839999999999918,
-          "pace" : 0.18933333333332789,
-          "transcriptionSentence" : " He arrived in time to see three white-fested",
-          "zscore" : -3.370366125849139
+          "zscore" : -3.0367861283664865
         }
       ]
     },
@@ -77,12 +51,12 @@
       "chapterName" : "Chapter 13",
       "sentences" : [
         {
-          "chapterSentence" : "\"Come, Ryalla, we should go prepare.\"",
+          "chapterSentence" : "“Come, Ryalla, we should go prepare.”",
           "chapterSentenceId" : 150,
-          "duration" : 0.2999999999999545,
-          "pace" : 0.04999999999999242,
+          "duration" : 0.53449999999998,
+          "pace" : 0.08908333333333,
           "transcriptionSentence" : "Come , Riala. We should go prepare.\"",
-          "zscore" : -4.2895956340951775
+          "zscore" : -3.9080654788170825
         }
       ]
     },
@@ -91,246 +65,26 @@
       "chapterName" : "Chapter 17",
       "sentences" : [
         {
-          "chapterSentence" : "Collecting his own equipment, Martis took one final gulp from the waterboy's trough, then waved farewell to the ever-present female onlookers and made his way out of the gardens.",
-          "chapterSentenceId" : 8,
-          "duration" : 4.799999999999997,
-          "pace" : 0.16551724137931026,
-          "transcriptionSentence" : " Collecting his own equipment , Martis took one final gulp from the water-boy's",
-          "zscore" : -3.7624267974973993
-        },
-        {
-          "chapterSentence" : "Jerick nodded.",
+          "chapterSentence" : "Jerick nodded. ",
           "chapterSentenceId" : 239,
           "duration" : 0.13000000000010914,
           "pace" : 0.06500000000005457,
           "transcriptionSentence" : " \"",
-          "zscore" : -3.2868417481906373
+          "zscore" : -3.2917834368549794
         }
       ]
     },
     {
-      "chapterId" : "ch22.xhtml",
-      "chapterName" : "Chapter 22",
+      "chapterId" : "ch26.xhtml",
+      "chapterName" : "Chapter 26",
       "sentences" : [
         {
-          "chapterSentence" : "\"A place where you can … ?\"",
-          "chapterSentenceId" : 74,
-          "duration" : 0.9850000000000136,
-          "pace" : 0.14071428571428765,
-          "transcriptionSentence" : " place where you can \"",
-          "zscore" : -2.4488449683097326
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch23.xhtml",
-      "chapterName" : "Chapter 23",
-      "sentences" : [
-        {
-          "chapterSentence" : "The firepit sat at the center of the room like a great brooding doorway straight to the underworld, its scarlet coals giving harsh illumination to the room.",
-          "chapterSentenceId" : 64,
-          "duration" : 2.6000000000000227,
-          "pace" : 0.09629629629629714,
-          "transcriptionSentence" : " The fire-pit",
-          "zscore" : -5.46489773823976
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch30.xhtml",
-      "chapterName" : "Chapter 30",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"Its'in not fair,\" Keeg groaned.",
-          "chapterSentenceId" : 140,
-          "duration" : 0.599999999999909,
-          "pace" : 0.11999999999998182,
-          "transcriptionSentence" : "It's",
-          "zscore" : -3.2922452294920093
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch46.xhtml",
-      "chapterName" : "Chapter 46",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"What do you mean?\"",
-          "chapterSentenceId" : 402,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.0002499999999940883,
-          "transcriptionSentence" : " What do you mean ?",
-          "zscore" : -3.61798555895518
-        },
-        {
-          "chapterSentence" : "\"They probably knew that they couldn't maintain so many illusions at once, which is why they haven't done it before.",
-          "chapterSentenceId" : 404,
-          "duration" : 0.0009999999999763531,
-          "pace" : 4.999999999881766e-05,
-          "transcriptionSentence" : " They probably knew that they couldn't maintain so many illusions at once , which is why they haven't done it before.",
-          "zscore" : -6.373196411638035
-        },
-        {
-          "chapterSentence" : "Tzern thought for a moment.",
-          "chapterSentenceId" : 407,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.00019999999999527064,
-          "transcriptionSentence" : " Certain thought for a moment.",
-          "zscore" : -4.182329787115446
-        },
-        {
-          "chapterSentence" : "\"Greed,\" he finally determined.",
-          "chapterSentenceId" : 408,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.0002499999999940883,
-          "transcriptionSentence" : "Greed ,\" he finally determined.",
-          "zscore" : -4.1825570995752885
-        },
-        {
-          "chapterSentence" : "Jerick asked.",
-          "chapterSentenceId" : 410,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.0004999999999881766,
-          "transcriptionSentence" : " Jerrick asked.",
-          "zscore" : -3.6171143462232975
-        },
-        {
-          "chapterSentence" : "So, they risked everything on the chance to keep it all for themselves.\"",
-          "chapterSentenceId" : 413,
-          "duration" : 0.0009999999999763531,
-          "pace" : 7.692307692125793e-05,
-          "transcriptionSentence" : " so they risked everything on the chance to keep it all for themselves.\"",
-          "zscore" : -5.849499122354832
-        },
-        {
-          "chapterSentence" : "Jerick didn't answer immediately.",
-          "chapterSentenceId" : 414,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.0002499999999940883,
-          "transcriptionSentence" : " didn't answer immediately.",
-          "zscore" : -4.182650091036134
-        },
-        {
-          "chapterSentence" : "It seemed too much like a last effort, a desperate attempt to protect themselves, to have been fueled by greed.",
-          "chapterSentenceId" : 417,
-          "duration" : 0.0009999999999763531,
-          "pace" : 4.999999999881766e-05,
-          "transcriptionSentence" : " It seemed too much like a last effort , a desperate attempt to protect themselves , to have been fueled by greed.",
-          "zscore" : -6.373159087837943
-        },
-        {
-          "chapterSentence" : "Tzern shook his head.",
-          "chapterSentenceId" : 422,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.0002499999999940883,
-          "transcriptionSentence" : " Cern shook his head.",
-          "zscore" : -3.6181653330109653
-        },
-        {
-          "chapterSentence" : "\"No one else noticed the pieces, Jerick,\" he said.",
-          "chapterSentenceId" : 423,
-          "duration" : 0.0009999999999763531,
-          "pace" : 0.00011111111110848369,
-          "transcriptionSentence" : "No one else noticed the pieces , Jerrick ,\" he said.",
-          "zscore" : -5.103948477592666
-        },
-        {
-          "chapterSentence" : "Tzern was sometimes hard, but he was always honest, and he truly cared for his men.",
-          "chapterSentenceId" : 428,
-          "duration" : 0.0010000000002037268,
-          "pace" : 6.250000001273293e-05,
-          "transcriptionSentence" : " Sen was sometimes hard , but he was always honest , and he truly cared for his men.",
-          "zscore" : -5.849655106506257
-        },
-        {
-          "chapterSentence" : "Jerick blinked in surprise, completely stunned.",
-          "chapterSentenceId" : 430,
-          "duration" : 0.0010000000002037268,
-          "pace" : 0.00016666666670062114,
-          "transcriptionSentence" : " Jerrick Blinkton's surprise completely stunned.",
-          "zscore" : -4.772115098198838
-        },
-        {
-          "chapterSentence" : "Why?\"",
-          "chapterSentenceId" : 432,
-          "duration" : 0.0010000000002037268,
-          "pace" : 0.0010000000002037268,
-          "transcriptionSentence" : " Why ?\"",
-          "zscore" : -2.7457338461542284
-        },
-        {
-          "chapterSentence" : "\"It is the human way to be suspicious of those who appear too successful, Jerick,\" Tzern said.",
-          "chapterSentenceId" : 433,
-          "duration" : 0.9989999999997963,
-          "pace" : 0.05876470588234096,
-          "transcriptionSentence" : "It is the human way to be suspicious of those who appear too successful , Jerrick ,\" Cern said.",
-          "zscore" : -5.212358594793432
-        },
-        {
-          "chapterSentence" : "Jerick felt his mouth open in stupefaction.",
-          "chapterSentenceId" : 435,
-          "duration" : 0.0010000000002037268,
-          "pace" : 0.00014285714288624668,
-          "transcriptionSentence" : " Jerrick felt his mouth open in stupefaction.",
-          "zscore" : -4.77199700357696
-        },
-        {
-          "chapterSentence" : "\"I apologize for this,\" Tzern said.",
-          "chapterSentenceId" : 436,
-          "duration" : 0.0010000000002037268,
-          "pace" : 0.00016666666670062114,
-          "transcriptionSentence" : "I apologize for this ,\" Cern said.",
-          "zscore" : -4.182732454901145
-        },
-        {
-          "chapterSentence" : "You are what you appear to be.\"",
-          "chapterSentenceId" : 440,
-          "duration" : 0.0010000000002037268,
-          "pace" : 0.00014285714288624668,
-          "transcriptionSentence" : " You are what you appear to be.\"",
-          "zscore" : -4.1825570995749395
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch47.xhtml",
-      "chapterName" : "Chapter 47",
-      "sentences" : [
-        {
-          "chapterSentence" : "We…\"",
-          "chapterSentenceId" : 354,
-          "duration" : 0.07000000000016371,
-          "pace" : 0.07000000000016371,
-          "transcriptionSentence" : " We",
-          "zscore" : -2.3866923076925297
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch50.xhtml",
-      "chapterName" : "Chapter 50",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"Such as?\"",
-          "chapterSentenceId" : 17,
-          "duration" : 0.25499999999999545,
-          "pace" : 0.12749999999999773,
-          "transcriptionSentence" : " Such",
-          "zscore" : -2.2206615384625468
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch53.xhtml",
-      "chapterName" : "Chapter 53",
-      "sentences" : [
-        {
-          "chapterSentence" : "Jerick had.",
-          "chapterSentenceId" : 403,
-          "duration" : 0.25,
-          "pace" : 0.125,
-          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]",
-          "zscore" : -2.2782062937073175
+          "chapterSentence" : "“You were wonderful. ",
+          "chapterSentenceId" : 93,
+          "duration" : 0.06000000000005912,
+          "pace" : 0.020000000000019707,
+          "transcriptionSentence" : " You were wonderful ,",
+          "zscore" : -3.505963620232967
         }
       ]
     }
@@ -342,7 +96,7 @@
 
   ],
   "modelName" : "ggml-tiny.en",
-  "osVersion" : "26.0.1",
+  "osVersion" : "macOS 26.1",
   "outputPath" : "file:.\/Tests\/TestBooks\/DragonsteelPrime\/DragonsteelPrime_narrated_tiny.en.epub",
   "rebuiltSentences" : [
     {
@@ -357,36 +111,63 @@
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
         },
         {
-          "chapterSentence" : "As soon as Jerick stepped into Ki Tzern's camp he realized all his assumptions about armies in the Eternal War had been wrong.",
+          "chapterSentence" : "As soon as Jerick stepped into Ki Tzern’s camp he realized all his assumptions about armies in the Eternal War had been wrong. ",
           "chapterSentenceId" : 1,
           "duration" : 9.922,
           "pace" : 0.43139130434782613,
           "transcriptionSentence" : " As soon as Jerrick stepped into Kite-Zern's camp , he realized all his assumptions about armies in the eternal war had been wrong."
         },
         {
-          "chapterSentence" : "He had based them on the single, faulty example of Demetris's camp.",
+          "chapterSentence" : "He had based them on the single, faulty example of Demetris’s camp. ",
           "chapterSentenceId" : 2,
           "duration" : 5.5219999999999985,
           "pace" : 0.46016666666666656,
           "transcriptionSentence" : " He had based them on the single faulty example of Demetrius' camp."
         }
       ]
+    },
+    {
+      "chapterId" : "ch53.xhtml",
+      "chapterName" : "Chapter 53",
+      "sentences" : [
+        {
+          "chapterSentence" : "The Sho Del hadn’t killed his father. ",
+          "chapterSentenceId" : 402,
+          "duration" : 4.4529999999999745,
+          "pace" : 0.6361428571428535,
+          "transcriptionSentence" : " The showdown hadn't killed his father."
+        },
+        {
+          "chapterSentence" : "Jerick had.",
+          "chapterSentenceId" : 403,
+          "duration" : 1.6169999999999618,
+          "pace" : 0.8084999999999809,
+          "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]"
+        },
+        {
+          "chapterSentence" : "“I killed him, Frost,” Jerick mumbled. ",
+          "chapterSentenceId" : 404,
+          "duration" : 4.9900000000002365,
+          "pace" : 0.8316666666667061,
+          "transcriptionSentence" : " I killed him frost , Jerrick mumbled."
+        }
+      ]
     }
   ],
-  "runtime" : 425.32242798805237,
-  "score" : 99.31,
+  "runtime" : 413.0167683362961,
+  "score" : 99.45,
   "shortDurationSentences" : [
     {
       "chapterId" : "ch01.xhtml",
       "chapterName" : "Chapter 1",
       "sentences" : [
         {
-          "chapterSentence" : "\"But…\"",
+          "chapterSentence" : "“But…”",
           "chapterSentenceId" : 354,
           "duration" : 0.3409999999998945,
           "pace" : 0.3409999999998945,
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]",
-          "zscore" : -1.57089517045447
+          "zscore" : -1.5645342776205724
         }
       ]
     },
@@ -395,12 +176,12 @@
       "chapterName" : "Chapter 2",
       "sentences" : [
         {
-          "chapterSentence" : "\"Yes.",
+          "chapterSentence" : "“Yes. ",
           "chapterSentenceId" : 422,
           "duration" : 0.2400000000000091,
           "pace" : 0.2400000000000091,
           "transcriptionSentence" : " Yes.",
-          "zscore" : -1.6096022727271508
+          "zscore" : -1.6031317280454604
         }
       ]
     },
@@ -409,20 +190,20 @@
       "chapterName" : "Chapter 3",
       "sentences" : [
         {
-          "chapterSentence" : "\"I…\"",
+          "chapterSentence" : "“I…”",
           "chapterSentenceId" : 184,
           "duration" : 0.4500000000000455,
           "pace" : 0.4500000000000455,
           "transcriptionSentence" : ",",
-          "zscore" : -1.529122159090778
+          "zscore" : -1.5228796033995484
         },
         {
-          "chapterSentence" : "\"Father!",
+          "chapterSentence" : "“Father! ",
           "chapterSentenceId" : 598,
           "duration" : 0.38000000000010914,
           "pace" : 0.38000000000010914,
           "transcriptionSentence" : "Father ,",
-          "zscore" : -1.5559488636362067
+          "zscore" : -1.5496303116148236
         }
       ]
     },
@@ -431,40 +212,12 @@
       "chapterName" : "Chapter 4",
       "sentences" : [
         {
-          "chapterSentence" : "\"Your Majesty?\"",
+          "chapterSentence" : "“Your Majesty?” ",
           "chapterSentenceId" : 92,
           "duration" : 0.5,
           "pace" : 0.25,
           "transcriptionSentence" : "Your Majesty ,\"",
-          "zscore" : -1.5099602272726147
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch06.xhtml",
-      "chapterName" : "Chapter 6",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"Girls?\"",
-          "chapterSentenceId" : 186,
-          "duration" : 0.4199999999999591,
-          "pace" : 0.4199999999999591,
-          "transcriptionSentence" : " Girls ,",
-          "zscore" : -1.5406193181817196
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch10.xhtml",
-      "chapterName" : "Chapter 10",
-      "sentences" : [
-        {
-          "chapterSentence" : "Come on.\"",
-          "chapterSentenceId" : 167,
-          "duration" : 0.3550000000000182,
-          "pace" : 0.1775000000000091,
-          "transcriptionSentence" : " Come on.\"",
-          "zscore" : -1.565529829545332
+          "zscore" : -1.503771954674352
         }
       ]
     },
@@ -473,28 +226,20 @@
       "chapterName" : "Chapter 12",
       "sentences" : [
         {
-          "chapterSentence" : "\"Us?\"",
-          "chapterSentenceId" : 153,
-          "duration" : 0.4550000000000409,
-          "pace" : 0.4550000000000409,
-          "transcriptionSentence" : "Us ,\"",
-          "zscore" : -1.5272059659089618
-        },
-        {
-          "chapterSentence" : "\"But—\"",
+          "chapterSentence" : "“But—”",
           "chapterSentenceId" : 206,
           "duration" : 0.22000000000002728,
           "pace" : 0.22000000000002728,
           "transcriptionSentence" : " but",
-          "zscore" : -1.6172670454544162
+          "zscore" : -1.6107747875355392
         },
         {
-          "chapterSentence" : "\"Move!\"",
+          "chapterSentence" : "“Move!” ",
           "chapterSentenceId" : 283,
           "duration" : 0.49500000000011823,
           "pace" : 0.49500000000011823,
           "transcriptionSentence" : "Move ,\"",
-          "zscore" : -1.5118764204543875
+          "zscore" : -1.505682719546828
         }
       ]
     },
@@ -503,20 +248,20 @@
       "chapterName" : "Chapter 13",
       "sentences" : [
         {
-          "chapterSentence" : "\"But…\"",
+          "chapterSentence" : "“But…”",
           "chapterSentenceId" : 45,
           "duration" : 0.21000000000000796,
           "pace" : 0.21000000000000796,
           "transcriptionSentence" : " But",
-          "zscore" : -1.6210994318180598
+          "zscore" : -1.6145963172805893
         },
         {
-          "chapterSentence" : "\"Yes.",
+          "chapterSentence" : "“Yes. ",
           "chapterSentenceId" : 145,
           "duration" : 0.5000000000001137,
           "pace" : 0.5000000000001137,
           "transcriptionSentence" : "Yes",
-          "zscore" : -1.5099602272725714
+          "zscore" : -1.5037719546743087
         }
       ]
     },
@@ -525,12 +270,12 @@
       "chapterName" : "Chapter 14",
       "sentences" : [
         {
-          "chapterSentence" : "\"Ah.",
+          "chapterSentence" : "“Ah. ",
           "chapterSentenceId" : 92,
           "duration" : 0.34999999999990905,
           "pace" : 0.34999999999990905,
           "transcriptionSentence" : "Ah ,",
-          "zscore" : -1.5674460227271916
+          "zscore" : -1.561094900850028
         }
       ]
     },
@@ -539,36 +284,28 @@
       "chapterName" : "Chapter 15",
       "sentences" : [
         {
-          "chapterSentence" : "\"Forever?\"",
+          "chapterSentence" : "“Forever?”",
           "chapterSentenceId" : 112,
           "duration" : 0.4600000000000364,
           "pace" : 0.4600000000000364,
           "transcriptionSentence" : "Forever ?\"",
-          "zscore" : -1.5252897727271455
+          "zscore" : -1.5190580736545092
         },
         {
-          "chapterSentence" : "\"I…\"",
+          "chapterSentence" : "“I…”",
           "chapterSentenceId" : 205,
           "duration" : 0.1999999999998181,
           "pace" : 0.1999999999998181,
           "transcriptionSentence" : "I",
-          "zscore" : -1.6249318181817685
+          "zscore" : -1.6184178470257047
         },
         {
-          "chapterSentence" : "Why?",
-          "chapterSentenceId" : 273,
-          "duration" : 0.4700000000000273,
-          "pace" : 0.4700000000000273,
-          "transcriptionSentence" : " Why ?",
-          "zscore" : -1.5214573863635128
-        },
-        {
-          "chapterSentence" : "\"And?\"",
+          "chapterSentence" : "“And?” ",
           "chapterSentenceId" : 344,
           "duration" : 0.45499999999992724,
           "pace" : 0.45499999999992724,
           "transcriptionSentence" : " and ,",
-          "zscore" : -1.5272059659090054
+          "zscore" : -1.520968838527072
         }
       ]
     },
@@ -577,12 +314,26 @@
       "chapterName" : "Chapter 16",
       "sentences" : [
         {
-          "chapterSentence" : "\"No.",
+          "chapterSentence" : "“No. ",
           "chapterSentenceId" : 269,
-          "duration" : 0.3949999999999818,
-          "pace" : 0.3949999999999818,
+          "duration" : 0.27149999999983265,
+          "pace" : 0.27149999999983265,
           "transcriptionSentence" : "No",
-          "zscore" : -1.5502002840908011
+          "zscore" : -1.5910939093486431
+        }
+      ]
+    },
+    {
+      "chapterId" : "ch18.xhtml",
+      "chapterName" : "Chapter 18",
+      "sentences" : [
+        {
+          "chapterSentence" : "“Good. ",
+          "chapterSentenceId" : 292,
+          "duration" : 0.5080000000000382,
+          "pace" : 0.5080000000000382,
+          "transcriptionSentence" : "Good",
+          "zscore" : -1.5007147308783033
         }
       ]
     },
@@ -596,7 +347,7 @@
           "duration" : 0.4199999999998454,
           "pace" : 0.4199999999998454,
           "transcriptionSentence" : "Please ,",
-          "zscore" : -1.5406193181817631
+          "zscore" : -1.5343441926347532
         }
       ]
     },
@@ -605,12 +356,12 @@
       "chapterName" : "Chapter 21",
       "sentences" : [
         {
-          "chapterSentence" : "Topaz.",
+          "chapterSentence" : "Topaz. ",
           "chapterSentenceId" : 364,
           "duration" : 0.45499999999992724,
           "pace" : 0.45499999999992724,
           "transcriptionSentence" : " Topaz ,",
-          "zscore" : -1.5272059659090054
+          "zscore" : -1.520968838527072
         }
       ]
     },
@@ -619,12 +370,12 @@
       "chapterName" : "Chapter 24",
       "sentences" : [
         {
-          "chapterSentence" : "\"But…\"",
+          "chapterSentence" : "“But…”",
           "chapterSentenceId" : 431,
           "duration" : 0.3200000000001637,
           "pace" : 0.3200000000001637,
           "transcriptionSentence" : " but",
-          "zscore" : -1.5789431818180026
+          "zscore" : -1.5725594900850595
         }
       ]
     },
@@ -633,20 +384,20 @@
       "chapterName" : "Chapter 25",
       "sentences" : [
         {
-          "chapterSentence" : "\"But—\"",
+          "chapterSentence" : "“But—”",
           "chapterSentenceId" : 188,
           "duration" : 0.25,
           "pace" : 0.25,
           "transcriptionSentence" : "[_MISSING_TIMESTAMP_IDENTIFIER_]",
-          "zscore" : -1.6057698863635181
+          "zscore" : -1.5993101983004212
         },
         {
-          "chapterSentence" : "\"You!\"",
+          "chapterSentence" : "“You!” ",
           "chapterSentenceId" : 208,
-          "duration" : 0.5099999999997635,
-          "pace" : 0.5099999999997635,
+          "duration" : 0.4199999999998454,
+          "pace" : 0.4199999999998454,
           "transcriptionSentence" : "You ,\"",
-          "zscore" : -1.5061278409090693
+          "zscore" : -1.5343441926347532
         }
       ]
     },
@@ -655,12 +406,12 @@
       "chapterName" : "Chapter 29",
       "sentences" : [
         {
-          "chapterSentence" : "\"But…\"",
+          "chapterSentence" : "“But…”",
           "chapterSentenceId" : 115,
           "duration" : 0.2749999999998636,
           "pace" : 0.2749999999998636,
           "transcriptionSentence" : " but",
-          "zscore" : -1.5961889204544801
+          "zscore" : -1.5897563739378664
         }
       ]
     },
@@ -669,26 +420,12 @@
       "chapterName" : "Chapter 30",
       "sentences" : [
         {
-          "chapterSentence" : "\"Me?\"",
+          "chapterSentence" : "“Me?” ",
           "chapterSentenceId" : 95,
           "duration" : 0.438000000000045,
           "pace" : 0.438000000000045,
           "transcriptionSentence" : "Me ,\"",
-          "zscore" : -1.5337210227271416
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch32.xhtml",
-      "chapterName" : "Chapter 32",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"Good.",
-          "chapterSentenceId" : 276,
-          "duration" : 0.2300000000000182,
-          "pace" : 0.2300000000000182,
-          "transcriptionSentence" : "Good ,",
-          "zscore" : -1.6134346590907838
+          "zscore" : -1.5274654390936
         }
       ]
     },
@@ -697,20 +434,20 @@
       "chapterName" : "Chapter 33",
       "sentences" : [
         {
-          "chapterSentence" : "\"Sir!\"",
+          "chapterSentence" : "“Sir!” ",
           "chapterSentenceId" : 60,
           "duration" : 0.4300000000000068,
           "pace" : 0.4300000000000068,
           "transcriptionSentence" : " sir ,\"",
-          "zscore" : -1.5367869318180651
+          "zscore" : -1.5305226628896489
         },
         {
-          "chapterSentence" : "\"This?\"",
+          "chapterSentence" : "“This?” ",
           "chapterSentenceId" : 374,
           "duration" : 0.39000000000010004,
           "pace" : 0.39000000000010004,
           "transcriptionSentence" : " This ,",
-          "zscore" : -1.552116477272574
+          "zscore" : -1.545808781869784
         }
       ]
     },
@@ -719,20 +456,20 @@
       "chapterName" : "Chapter 35",
       "sentences" : [
         {
-          "chapterSentence" : "\"Done!\"",
+          "chapterSentence" : "“Done!” ",
           "chapterSentenceId" : 385,
           "duration" : 0.4800000000000182,
           "pace" : 0.4800000000000182,
           "transcriptionSentence" : "Done ,\"",
-          "zscore" : -1.5176249999998803
+          "zscore" : -1.5114150141644307
         },
         {
-          "chapterSentence" : "Split!",
+          "chapterSentence" : "Split! ",
           "chapterSentenceId" : 449,
           "duration" : 0.25999999999976353,
           "pace" : 0.25999999999976353,
           "transcriptionSentence" : " lit",
-          "zscore" : -1.6019374999999727
+          "zscore" : -1.5954886685554688
         }
       ]
     },
@@ -741,28 +478,20 @@
       "chapterName" : "Chapter 36",
       "sentences" : [
         {
-          "chapterSentence" : "\"Wait!\"",
+          "chapterSentence" : "“Wait!” ",
           "chapterSentenceId" : 148,
           "duration" : 0.48500000000001364,
           "pace" : 0.48500000000001364,
           "transcriptionSentence" : "Wait !\"",
-          "zscore" : -1.5157088068180637
+          "zscore" : -1.5095042492919108
         },
         {
-          "chapterSentence" : "It's…\"",
-          "chapterSentenceId" : 172,
-          "duration" : 0.47500000000002274,
-          "pace" : 0.47500000000002274,
-          "transcriptionSentence" : " it's —",
-          "zscore" : -1.5195411931816964
-        },
-        {
-          "chapterSentence" : "\"But…\"",
+          "chapterSentence" : "“But…”",
           "chapterSentenceId" : 183,
           "duration" : 0.4700000000000273,
           "pace" : 0.4700000000000273,
           "transcriptionSentence" : " But ,",
-          "zscore" : -1.5214573863635128
+          "zscore" : -1.51523654390947
         }
       ]
     },
@@ -771,26 +500,12 @@
       "chapterName" : "Chapter 37",
       "sentences" : [
         {
-          "chapterSentence" : "\"I…\"",
+          "chapterSentence" : "“I…”",
           "chapterSentenceId" : 40,
           "duration" : 0.5050000000000239,
           "pace" : 0.5050000000000239,
           "transcriptionSentence" : "I —",
-          "zscore" : -1.5080440340907875
-        }
-      ]
-    },
-    {
-      "chapterId" : "ch40.xhtml",
-      "chapterName" : "Chapter 40",
-      "sentences" : [
-        {
-          "chapterSentence" : "\"Sir!\"",
-          "chapterSentenceId" : 248,
-          "duration" : 0.5199999999999818,
-          "pace" : 0.5199999999999818,
-          "transcriptionSentence" : "Sir ,\"",
-          "zscore" : -1.5022954545453495
+          "zscore" : -1.5018611898018217
         }
       ]
     },
@@ -799,12 +514,12 @@
       "chapterName" : "Chapter 41",
       "sentences" : [
         {
-          "chapterSentence" : "\"Sir?\"",
+          "chapterSentence" : "“Sir?” ",
           "chapterSentenceId" : 64,
           "duration" : 0.36000000000001364,
           "pace" : 0.36000000000001364,
           "transcriptionSentence" : " Sir ,",
-          "zscore" : -1.5636136363635154
+          "zscore" : -1.5572733711049456
         }
       ]
     },
@@ -813,12 +528,12 @@
       "chapterName" : "Chapter 42",
       "sentences" : [
         {
-          "chapterSentence" : "I—\"",
+          "chapterSentence" : "I—”",
           "chapterSentenceId" : 159,
           "duration" : 0.25,
           "pace" : 0.25,
           "transcriptionSentence" : ",",
-          "zscore" : -1.6057698863635181
+          "zscore" : -1.5993101983004212
         }
       ]
     },
@@ -827,12 +542,26 @@
       "chapterName" : "Chapter 47",
       "sentences" : [
         {
-          "chapterSentence" : "Idiot!",
+          "chapterSentence" : "Idiot! ",
           "chapterSentenceId" : 235,
           "duration" : 0.4700000000000273,
           "pace" : 0.4700000000000273,
           "transcriptionSentence" : " Idiot ,",
-          "zscore" : -1.5214573863635128
+          "zscore" : -1.51523654390947
+        }
+      ]
+    },
+    {
+      "chapterId" : "ch50.xhtml",
+      "chapterName" : "Chapter 50",
+      "sentences" : [
+        {
+          "chapterSentence" : "“But—”",
+          "chapterSentenceId" : 311,
+          "duration" : 0.4600000000000364,
+          "pace" : 0.4600000000000364,
+          "transcriptionSentence" : "But",
+          "zscore" : -1.5190580736545092
         }
       ]
     },
@@ -841,12 +570,12 @@
       "chapterName" : "Chapter 51",
       "sentences" : [
         {
-          "chapterSentence" : "\"No!\"",
+          "chapterSentence" : "“No!” ",
           "chapterSentenceId" : 91,
           "duration" : 0.4600000000000364,
           "pace" : 0.4600000000000364,
           "transcriptionSentence" : " No ,",
-          "zscore" : -1.5252897727271455
+          "zscore" : -1.5190580736545092
         }
       ]
     },
@@ -855,12 +584,12 @@
       "chapterName" : "Chapter 52",
       "sentences" : [
         {
-          "chapterSentence" : "Grow!",
+          "chapterSentence" : "Grow! ",
           "chapterSentenceId" : 304,
           "duration" : 0.4499999999998181,
           "pace" : 0.4499999999998181,
           "transcriptionSentence" : "Grow",
-          "zscore" : -1.529122159090865
+          "zscore" : -1.5228796033996355
         }
       ]
     },
@@ -869,63 +598,50 @@
       "chapterName" : "Chapter 53",
       "sentences" : [
         {
-          "chapterSentence" : "Tell me.",
+          "chapterSentence" : "Tell me. ",
           "chapterSentenceId" : 72,
-          "duration" : 0.5199999999999818,
-          "pace" : 0.2599999999999909,
+          "duration" : 0.4919999999999618,
+          "pace" : 0.2459999999999809,
           "transcriptionSentence" : " me ,",
-          "zscore" : -1.5022954545453495
+          "zscore" : -1.5068291784704009
         }
       ]
     }
   ],
   "slowPaceSentences" : [
-    {
-      "chapterId" : "ch46.xhtml",
-      "chapterName" : "Chapter 46",
-      "sentences" : [
-        {
-          "chapterSentence" : "But why risk so much simply for Dragonsteel?",
-          "chapterSentenceId" : 418,
-          "duration" : 12.038999999999987,
-          "pace" : 1.5048749999999984,
-          "transcriptionSentence" : " But why risk so much simply for Dragonsteel ?",
-          "zscore" : 11.552404414334681
-        }
-      ]
-    }
+
   ],
   "stageRunTimes" : {
     "align" : [
-      783794798.980131,
-      783794855.910145
+      788208556.100681,
+      788208607.208925
     ],
     "audio" : [
-      783794454.964918,
-      783794461.685505
+      788208218.542393,
+      788208225.525181
     ],
     "epub" : [
-      783794449.463014,
-      783794454.964901
+      788208213.109028,
+      788208218.542376
     ],
     "export" : [
-      783794857.641713,
-      783794874.785524
+      788208609.461973,
+      788208626.125855
     ],
     "report" : [
-      783794874.785543,
-      783794875.802607
+      788208626.125884,
+      788208632.504154
     ],
     "transcribe" : [
-      783794461.685513,
-      783794798.980102
+      788208225.525188,
+      788208556.100672
     ],
     "xml" : [
-      783794855.910162,
-      783794857.641702
+      788208607.208941,
+      788208609.461963
     ]
   },
-  "toolTitle" : "storyalign 0.12-dev",
+  "toolTitle" : "storyalign 0.13-dev",
   "transcriptionStats" : {
     "averagePace" : 0.39915264535474754,
     "avgSecsPerVoiceLen" : 0.08802411507821305,

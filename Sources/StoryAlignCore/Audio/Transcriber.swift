@@ -16,27 +16,34 @@ public enum TranscriberType:Int, Codable {
     case sfspeech
 }
 
-public struct TranscriptionToken : Codable,Sendable {
+public struct TranscriptionToken : Codable,Sendable, Equatable,Hashable {
     let text:String
     let start:TimeInterval
     let end:TimeInterval
     let voiceLen:Double
     let dtw:TimeInterval
+    let timeConfidence:Double
+    let textConfidence:Double
     
     func with(
            text: String? = nil,
            start: TimeInterval? = nil,
            end: TimeInterval? = nil,
            voiceLen: Double? = nil,
-           dtw: TimeInterval? = nil
+           dtw: TimeInterval? = nil,
+           timeStampConfidence:Double? = nil,
+           textConfidence:Double? = nil
        ) -> TranscriptionToken {
-           TranscriptionToken(
+           let tt = TranscriptionToken(
                text:    text    ?? self.text,
                start:   start   ?? self.start,
                end:     end     ?? self.end,
                voiceLen: voiceLen ?? self.voiceLen,
-               dtw:     dtw     ?? self.dtw
+               dtw:     dtw     ?? self.dtw,
+               timeConfidence: timeStampConfidence ?? self.timeConfidence,
+               textConfidence: textConfidence ?? self.textConfidence
            )
+           return tt
        }
 }
 extension TranscriptionToken : CustomStringConvertible, CustomDebugStringConvertible {
@@ -80,7 +87,10 @@ public struct TranscriptionSegment:Codable,Sendable {
     var isFastPaced:Bool { secondsPerWord < fastPaceThreshold }
     var endGap:Double { end - (tokens.last?.end ?? 0) }
     var startGap:Double { (tokens.first?.start ?? 0) - start}
-    var voiceLen:Double { tokens.reduce(0) { $0 + $1.voiceLen } }
+    var voiceLen:Double {
+        guard !tokens.isEmpty else { return text.voiceLength }
+        return tokens.reduce(0) { $0 + $1.voiceLen }
+    }
     var secondsPerVoiceLen:Double { duration/voiceLen }
 }
 
@@ -107,13 +117,57 @@ public struct WordTimeStamp:Codable, Hashable,Sendable {
     let start: TimeInterval
     let end: TimeInterval
     let audioFile:AudioFile
-    let voiceLen:Double
+    let transcriptionTokens:[TranscriptionToken]
     let segmentIndex:Int
     let tokenTypeGuess:TokenTypeGuess
     var index:Int = -1
     var startOffset: Int = -1
     var endOffset: Int = -1
+    var isInterpolated:Bool = false
+    var isRebuilt:Bool = false
     
+    var origStart:TimeInterval {
+        transcriptionTokens.first?.start ?? start
+    }
+    var origEnd:TimeInterval {
+        transcriptionTokens.last?.end ?? end
+    }
+    var origDuration:TimeInterval {
+        self.origEnd-self.origStart
+    }
+    
+    var timeConfidence:Double {
+        var weighted = 0.0
+        var total = 0.0
+        for transcriptionToken in transcriptionTokens {
+            let c = transcriptionToken.timeConfidence
+            let d = max(0, transcriptionToken.end - transcriptionToken.start)
+            if d <= 0 { continue }
+            weighted += c * d
+            total += d
+        }
+        if total <= 0 { return  0.0 }
+        return weighted / total
+    }
+    var textConfidence:Double {
+        var weighted = 0.0
+        var total = 0.0
+        for transcriptionToken in transcriptionTokens {
+            let c = transcriptionToken.textConfidence
+            let d = max(0, transcriptionToken.end - transcriptionToken.start)
+            if d <= 0 { continue }
+            weighted += c * d
+            total += d
+        }
+        if total <= 0 { return  0.0 }
+        return weighted / total
+    }
+    
+    var voiceLen:Double {
+        guard !transcriptionTokens.isEmpty else { return token.voiceLength }
+        return transcriptionTokens.reduce(0.0) { $0 + $1.voiceLen }
+    }
+
     func with(
         token: String? = nil,
         start: TimeInterval? = nil,
@@ -121,29 +175,73 @@ public struct WordTimeStamp:Codable, Hashable,Sendable {
         startOffset: Int? = nil,
         endOffset: Int? = nil,
         audioFile: AudioFile? = nil,
-        voiceLen: Double? = nil,
+        transcriptionTokens:[TranscriptionToken]? = nil,
         index: Int? = nil,
         segmentIndex: Int? = nil,
-        tokenTypeGuess:TokenTypeGuess? = nil
+        tokenTypeGuess:TokenTypeGuess? = nil,
+        isInterpolated:Bool? = nil,
+        isRebuilt:Bool? = nil,
+
     ) -> WordTimeStamp {
-        WordTimeStamp(
+        let ts = WordTimeStamp(            
             token: token ?? self.token,
             start: start ?? self.start,
             end: end ?? self.end,
             audioFile: audioFile ?? self.audioFile,
-            voiceLen: voiceLen ?? self.voiceLen,
+            transcriptionTokens: transcriptionTokens ?? self.transcriptionTokens,
             segmentIndex: segmentIndex ?? self.segmentIndex,
             tokenTypeGuess: tokenTypeGuess ?? self.tokenTypeGuess,
             index: index ?? self.index,
             startOffset: startOffset ?? self.startOffset,
             endOffset: endOffset ?? self.endOffset,
+            isInterpolated: isInterpolated ?? self.isInterpolated,
+            isRebuilt: isRebuilt ?? self.isRebuilt,
         )
+
+        return ts
+    }
+    
+
+    func merged(with other: WordTimeStamp) -> WordTimeStamp {
+        let mergedStartOffset: Int
+        if startOffset >= 0 && other.startOffset >= 0 {
+            mergedStartOffset = min(startOffset, other.startOffset)
+        } else if startOffset >= 0 {
+            mergedStartOffset = startOffset
+        } else if other.startOffset >= 0 {
+            mergedStartOffset = other.startOffset
+        } else {
+            mergedStartOffset = -1
+        }
+        
+        let mergedEndOffset: Int
+        if endOffset >= 0 && other.endOffset >= 0 {
+            mergedEndOffset = max(endOffset, other.endOffset)
+        } else if endOffset >= 0 {
+            mergedEndOffset = endOffset
+        } else if other.endOffset >= 0 {
+            mergedEndOffset = other.endOffset
+        } else {
+            mergedEndOffset = -1
+        }
+        
+        let nuStamp = self.with(
+            token: token + other.token,
+            start: min(start, other.start),
+            end: max(end, other.end),
+            startOffset: mergedStartOffset,
+            endOffset: mergedEndOffset,
+            transcriptionTokens: self.transcriptionTokens + other.transcriptionTokens,
+            isInterpolated: isInterpolated || other.isInterpolated,
+            isRebuilt: isRebuilt || other.isRebuilt,
+        )
+        return nuStamp
     }
     
     var absoluteStart:TimeInterval {
         return audioFile.startTmeInterval + start
     }
-    var absoulteEnd:TimeInterval {
+    var absoluteEnd:TimeInterval {
         return audioFile.startTmeInterval + end
     }
     
@@ -167,12 +265,13 @@ extension [WordTimeStamp] {
     }
     
     var hasOverlaps : Bool {
+        if self.isEmpty {
+            return false
+        }
         for i in 0..<self.count - 1 {
             if self[i].audioFile.filePath != self[i+1].audioFile.filePath {
                 continue
             }
-            //let roundedEnd = (self[i].end * 100).rounded() / 100
-            //let roundedNextStart = (self[i+1].start * 100).rounded() / 100
             if  self[i].end > self[i+1].start {
                 return true
             }
@@ -214,7 +313,7 @@ extension [WordTimeStamp] {
 
 
 
-public struct Transcription:/*Codable,*/ Sendable {
+public struct Transcription: Sendable {
     let transcription:String
     public let segments:[TranscriptionSegment]
     let wordTimeline: [WordTimeStamp]
@@ -230,9 +329,6 @@ public struct Transcription:/*Codable,*/ Sendable {
             let range = sentencesOffsets[mid]
             if range.contains(offset) {
                 return mid
-            }
-            if range.lowerBound < offset {
-                
             }
             if range.lowerBound < offset {
                 low = mid + 1
@@ -295,18 +391,7 @@ public extension Transcription {
             let segIndex = acc.segments.count
                         
             let adjustedTimeline = current.wordTimeline.map { entry in
-                let timestamp = WordTimeStamp(
-                    token: entry.token,
-                    start: entry.start,
-                    end: entry.end,
-                    audioFile: entry.audioFile,
-                    voiceLen: entry.voiceLen,
-                    segmentIndex: entry.segmentIndex + segIndex,
-                    tokenTypeGuess: entry.tokenTypeGuess,
-                    index:index,
-                    startOffset: offset,
-                    endOffset: max( offset, offset + entry.token.count - 1),
-                )
+                let timestamp = entry.with(startOffset:offset, endOffset:max( offset, offset + entry.token.count - 1), index:index, segmentIndex: entry.segmentIndex + segIndex)
                 index += 1
                 offset += entry.token.count
                 return timestamp
@@ -325,8 +410,10 @@ public extension Transcription {
         
         let longestSentenceLen = maxSentenceLen ?? NSInteger.max
         let avgSentenceLen = meanSentenceLen ?? 128
+        
+        let tokenizer = Tokenizer()
 
-        fullTranscription.sentences = NLTokenizer.tokenizeSentences(text: fullTranscription.transcription)
+        fullTranscription.sentences = tokenizer.tokenizeSentences(text: fullTranscription.transcription)
             .flatMap { (sentence) -> [String] in
                 if sentence.count < (longestSentenceLen) {
                     return [sentence]

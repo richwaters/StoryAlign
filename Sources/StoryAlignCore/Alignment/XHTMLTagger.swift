@@ -12,7 +12,30 @@ import SwiftSoup
 import NaturalLanguage
 
 
-struct XHTMLTagger {
+public enum Granularity: String , OrderedCaseIterable, Codable, Sendable {
+    case sentence
+    case phrase
+    case segment
+    case group
+    case word
+    
+    public static let orderedCases: [Granularity] = [.sentence, .phrase, .segment, .group, .word]
+
+    var useWordTokenizer:Bool {
+        switch self {
+            case .segment, .group, .word:
+                return true
+            default:
+                return false
+        }
+    }
+}
+
+
+
+struct XHTMLTagger : SessionConfigurable {
+    let sessionConfig: SessionConfig
+    
     static let dataSpaceAfterAttrName = "data-storyalign-space-after"
     
     let blocks = HTMLTags.blocks
@@ -36,7 +59,7 @@ struct XHTMLTagger {
             try lastLeafElement(in: prevEl).attr(Self.dataSpaceAfterAttrName, "1")
             return
         }
-        try parent.attr("data-space-after", "1")
+        try parent.attr( Self.dataSpaceAfterAttrName, "1")
     }
      
 
@@ -406,10 +429,20 @@ extension XHTMLTagger {
         )
 
         try mergeDupSpans(in: doc)
+        
+        if let emptySpans = try? findEmptySentenceSpans(in: doc) {
+            if !emptySpans.isEmpty {
+                logger.log( .info, "Found \(emptySpans.count) empty sentence spans after tagging")
+            }
+        }
+        
         return try prepareXhtmlOutput(from: doc)
     }
     
-    func tag( epub:EpubDocument, manifestItem:EpubManifestItem, chapterId: String) async throws -> String {
+    //func tag( epub:EpubDocument, manifestItem:EpubManifestItem, chapterId: String) async throws -> String {
+    func tag( epub:EpubDocument, alignedChapter:AlignedChapter) async throws -> String {
+        let manifestItem = alignedChapter.manifestItem
+        let chapterId = alignedChapter.manifestItem.id
         let xhtml = manifestItem.xmlText
         let doc = try SwiftSoup.parse(xhtml)
      
@@ -428,7 +461,9 @@ extension XHTMLTagger {
             .attr("href", stylePath)
             .attr("type", "text/css")
         
-        let retStr = try tag(sentences:manifestItem.xhtmlSentences,  in: doc, chapterId:chapterId)
+        let units = (sessionConfig.granularity!.useWordTokenizer) ? alignedChapter.alignedWords : alignedChapter.alignedSentences
+        let sentences = units.map { $0.xhtmlSentence }
+        let retStr = try tag(sentences:sentences,  in: doc, chapterId:chapterId)
         return retStr
     }
 }
@@ -451,6 +486,14 @@ extension XHTMLTagger {
         var sentences = [String]()
         var stagedText = ""
         
+        let tokenizer = Tokenizer()
+        let tokenize = { text in
+            if sessionConfig.granularity == .phrase {
+                return tokenizer.tokenizePhrases(text: text)
+            }
+            return tokenizer.tokenizeSentences(text: text)
+        }
+        
         for node in element.getChildNodes() {
             if let textNode = node as? TextNode {
                 stagedText += textNode.text()
@@ -460,14 +503,15 @@ extension XHTMLTagger {
                 if !blocks.contains(tagName) {
                     stagedText += try getXhtmlTextContent(from:[childElem])
                 } else {
-                    sentences += NLTokenizer.tokenizeSentences(text:stagedText).map { $0 }
+                    sentences += tokenize(stagedText).map { $0 }
                     stagedText = ""
                     sentences += try getXHtmlSentences(from: childElem)
                 }
             }
         }
         
-        sentences += NLTokenizer.tokenizeSentences(text:stagedText).map { $0 }
+        sentences += tokenize(stagedText).map { $0 }
+
         return sentences
     }
     
@@ -520,43 +564,93 @@ extension XHTMLTagger {
 }
 
 extension XHTMLTagger {
-    func mergeDupSpans(in doc: Document) throws {
-        let allSpans = try doc.select("span[id]").array()
-        var seen = Set<String>()
 
-        // group spans by their id
-        var spansById = [String: [Element]]()
-        for span in allSpans {
-             let id = try span.attr("id")
-             spansById[id, default: []].append(span)
+    func mergeDupSpans(in doc: Document) throws {
+        let allWithId = try doc.select("span[id]").array()
+        var byId = [String: [Element]]()
+        for s in allWithId {
+            byId[try s.attr("id"), default: []].append(s)
         }
-        
-        for (id, group) in spansById where group.count > 1 {
-            guard !seen.contains(id) else { continue }
-            seen.insert(id)
+
+        var orderedIds: [String] = []
+        var seen = Set<String>()
+        for s in allWithId {
+            let id = try s.attr("id")
+            if (byId[id]?.count ?? 0) > 1 && !seen.contains(id) {
+                orderedIds.append(id)
+                seen.insert(id)
+            }
+        }
+
+        var processedIds = Set<String>()
+        let sentenceSpansInDocOrder = try doc.select("span[id*=sentence]").array()
+
+        for id in orderedIds {
+            guard let group = byId[id], !group.isEmpty else { continue }
+
+            var sentenceSpans: [Element] = []
+            for chap in sentenceSpansInDocOrder {
+                if try chap.select("span[id=\(id)]").first() != nil {
+                    sentenceSpans.append(chap)
+                }
+            }
+            if sentenceSpans.isEmpty { continue }
 
             let merged = Element(Tag("span"), "")
-            for attr in (group[0].getAttributes() ?? Attributes()).asList() {
-                try merged.attr(attr.getKey(), attr.getValue())
+            for a in (group[0].getAttributes() ?? Attributes()).asList() {
+                try merged.attr(a.getKey(), a.getValue())
             }
-            
-            // figure out their enclosing sentence-spans
-            let sentenceSpans = group.compactMap { $0.parent() }
-            guard let firstSentence = sentenceSpans.first else { continue }
-            
-            try firstSentence.before(merged)
-            
-            for chapSpan in sentenceSpans {
-                // lift out its inner text/nodes from the little
-                if let innerSpan = try chapSpan.select("span[id=\(id)]").first() {
-                    let children = innerSpan.getChildNodes()
-                    for child in children {
-                        try innerSpan.before(child)
+
+            let firstChap = sentenceSpans[0]
+            var anchor: Element = firstChap
+            var placeAfter = false
+            var p = firstChap.parent()
+            while let parent = p {
+                if parent.tagName() == "span", parent.hasAttr("id") {
+                    let pid = try parent.attr("id")
+                    if processedIds.contains(pid), pid != id {
+                        anchor = parent
+                        placeAfter = true
+                        break
                     }
-                    try innerSpan.remove()
                 }
-                try merged.appendChild(chapSpan)
+                p = parent.parent()
             }
+            if placeAfter {
+                try _ = anchor.after(merged)
+            } else {
+                try anchor.before(merged)
+            }
+
+            for chap in sentenceSpans {
+                var insidePrev = false
+                var q = chap.parent()
+                while let parent = q {
+                    if parent.tagName() == "span", parent.hasAttr("id") {
+                        let pid = try parent.attr("id")
+                        if processedIds.contains(pid), pid != id { insidePrev = true; break }
+                    }
+                    q = parent.parent()
+                }
+
+                while let inner = try chap.select("span[id=\(id)]").first() {
+                    while inner.childNodeSize() > 0 {
+                        let n = inner.childNode(0)
+                        if insidePrev {
+                            try merged.appendChild(n)
+                        } else {
+                            try inner.before(n)
+                        }
+                    }
+                    try inner.remove()
+                }
+
+                if !insidePrev {
+                    try merged.appendChild(chap)
+                }
+            }
+
+            processedIds.insert(id)
         }
     }
 }
@@ -572,3 +666,27 @@ extension XHTMLTagger {
 }
 
 
+extension XHTMLTagger {
+    private func isSentenceId(_ id: String) -> Bool {
+        guard let r = id.range(of: "-sentence", options: .backwards) else { return false }
+        let suffix = id[r.upperBound...]
+        if suffix.isEmpty { return false }
+        return suffix.allSatisfy { $0.isNumber }
+    }
+
+    private func isEmptyText(_ e: Element) throws -> Bool {
+        try e.text().trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    func findEmptySentenceSpans(in doc: Document) throws -> [Element] {
+        try doc.select("span[id]").array().filter {
+            if $0.tagName() != "span" {
+                return false
+            }
+            if !isSentenceId(try $0.attr("id") ) {
+                return false
+            }
+            return try isEmptyText($0)
+        }
+    }
+}

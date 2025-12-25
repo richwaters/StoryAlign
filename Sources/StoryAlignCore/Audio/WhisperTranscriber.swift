@@ -251,7 +251,6 @@ func setupWhisperLogging( sessionConfig:SessionConfig ) {
 
 struct WhisperTranscriber : Transcriber, SessionConfigurable {
     func buildTranscription(from rawTranscription: RawTranscription) throws -> Transcription {
-        //let audioFile = transcription.audioFile
         let hydratedSegments = rawTranscription.segments
         let segments = mergeZeroDurationSegments(hydratedSegments)
         
@@ -260,9 +259,14 @@ struct WhisperTranscriber : Transcriber, SessionConfigurable {
         let wordTimeStamps = segments.enumerated().flatMap { (segIndex,seg) in
             let timeStamps = wordTimeStampsFrom(segment:seg, segmentIndex:segIndex, audioFile: seg.audioFile)
             let wordTimeStamps = tokenTimelineToWordTimeline(timeStamps)
-            let adjustedTimeStamps = spreadCollapsedRuns(wordTimeStamps: wordTimeStamps, segmentStart: seg.start, segmentEnd: seg.end)
+            let spreadTimeStamps = spreadCollapsedRuns(wordTimeStamps: wordTimeStamps, segmentStart: seg.start, segmentEnd: seg.end)
+            let adjustedTimeStamps = redistributeZeroDurations(wordTimeStamps: spreadTimeStamps, segmentStartTime: seg.start, segmentEndTime: seg.end)
             let (repairedTimeStamps,didRebuild) = fixOutOfWhackDurations(adjustedTimeStamps, segmentStart: seg.start, segmentEnd: seg.end, force: seg.needsRepair)
+
             rebuiltSegmentsCount += didRebuild ? 1 : 0
+            if didRebuild {
+                logger.log(.debug, "Rebuilt segement \(segIndex): \(seg.text)")
+            }
             
             if repairedTimeStamps.hasDuplicateConsecutiveSpans()  {
                 logger.log( .debug, "Transcription has duplicate consecutive spans in word timestamps" )
@@ -270,6 +274,7 @@ struct WhisperTranscriber : Transcriber, SessionConfigurable {
             if repairedTimeStamps.hasOverlaps  {
                 logger.log( .debug, "Transcription has overlaps word timestamps" )
             }
+
             return repairedTimeStamps
         }
             
@@ -292,7 +297,7 @@ struct WhisperTranscriber : Transcriber, SessionConfigurable {
         
         logger.log( .info, "Rebuilt \(rebuiltSegmentsCount) of \(segments.count) segments")
         
-        let transcription = Transcription(transcription: transcriptionTxt, segments: hydratedSegments, wordTimeline: indexedTimeStamps)
+        let transcription = Transcription(transcription: transcriptionTxt, segments: segments, wordTimeline: indexedTimeStamps)
         return transcription
     }
     
@@ -305,9 +310,7 @@ struct WhisperTranscriber : Transcriber, SessionConfigurable {
         let pcmSamples = try await audioLoader.decode(from: audioFile.filePath)
         logger.log( .debug, "Decode completed -- \(pcmSamples.count) samples")
 
-                   
         setupWhisperLogging( sessionConfig: sessionConfig )
-
 
         let context = try WhisperContextPool.acquire( sessionConfig: sessionConfig )
 
@@ -338,8 +341,6 @@ extension WhisperTranscriber {
         }
         
         let bareSegments = segments(from: context, audioFile:audioFile)
-        
-        
         let segStr = bareSegments.map { "\($0.start) to \($0.end): \($0.text)" }.joined(separator: "\n")
         logger.log(.debug, "Segments: \(segStr)" )
         
@@ -352,7 +353,7 @@ extension WhisperTranscriber {
         
         return RawTranscription( segments: hydratedSegments )
     }
-
+    
     func mergeZeroDurationSegments(_ segments: [TranscriptionSegment]) -> [TranscriptionSegment] {
         var result: [TranscriptionSegment] = []
         
@@ -366,10 +367,7 @@ extension WhisperTranscriber {
                 continue
             }
             
-            
             let next = (i < segments.count-1) ? segments[i+1] : nil
-
-            
             if !result.isEmpty {
                 let prev = result.removeLast()
                 
@@ -407,12 +405,12 @@ extension WhisperTranscriber {
             let b = whisperToken.end
             let rawStart = min(a, b)
             let rawEnd   = max(a, b)
-
+            
             let (start,end ) = {
                 if !sessionConfig.whisperDtw || dtw < 0 {
                     return (rawStart, rawEnd)
                 }
-
+                
                 let prevInfo = i > 0 ? whisperTokens[i - 1] : nil
                 let nextInfo = i < whisperTokens.count - 1 ? whisperTokens[i + 1] : nil
                 
@@ -429,9 +427,9 @@ extension WhisperTranscriber {
                 let end   = min(rawEnd,   max((dtw + nextAnchor)/2, rawStart))
                 return (start,end)
             }()
-
-            let timeStamp = WordTimeStamp( token: tokenStr, start: start, end: end,  audioFile: audioFile, voiceLen: whisperToken.voiceLen, segmentIndex: segmentIndex, tokenTypeGuess: .other , index:-1 )
             
+            let timeStamp = WordTimeStamp( token: tokenStr, start: start, end: end,  audioFile: audioFile, transcriptionTokens:[whisperToken], segmentIndex: segmentIndex, tokenTypeGuess: .other , index:-1 )
+
             return timeStamp
         }
         return timeStamps
@@ -461,7 +459,7 @@ extension WhisperTranscriber {
         let ctx = whisperCtx.ctx
         let segIndex = Int32( segIndex )
         let nTokens = whisper_full_n_tokens(ctx, segIndex)
-    
+        
         let whisperTokens = (0 ..< nTokens ).compactMap { (tokenIndex)->TranscriptionToken? in
             guard let tokenC = whisper_full_get_token_text(ctx, segIndex, tokenIndex) else {
                 return nil
@@ -501,10 +499,92 @@ extension WhisperTranscriber {
                 }
             }
             
-            return TranscriptionToken(text:tokenStr, start:Double(tokenData.t0)/100.0, end:Double(tokenData.t1)/100.0, voiceLen: Double(tokenData.vlen), dtw:dtw)
+            return TranscriptionToken(text:tokenStr, start:Double(tokenData.t0)/100.0, end:Double(tokenData.t1)/100.0, voiceLen: Double(tokenData.vlen), dtw:dtw, timeConfidence: Double(tokenData.pt), textConfidence: Double(tokenData.p))
         }
         
         return whisperTokens
+    }
+    
+    func redistributeZeroDurations(
+        wordTimeStamps: [WordTimeStamp],
+        segmentStartTime: Double,
+        segmentEndTime: Double,
+        minimumEpsilon: Double = 1e-9
+    ) -> [WordTimeStamp] {
+
+        var adjustedWordTimeStamps = wordTimeStamps
+        let totalCount = adjustedWordTimeStamps.count
+        var index = 0
+        
+        let hasZeroDur = wordTimeStamps.contains(where: { $0.end <= $0.start })
+        if !hasZeroDur {
+            return wordTimeStamps
+        }
+
+        while index < totalCount {
+            let currentStartTime = adjustedWordTimeStamps[index].start
+            let currentEndTime = adjustedWordTimeStamps[index].end
+            if currentEndTime > currentStartTime + minimumEpsilon {
+                index += 1
+                continue
+            }
+
+            var leftIndex = max(0, index - 1)
+            var rightIndex = min(totalCount - 1, index + 1)
+
+            if totalCount == 1 {
+                let newStartTime = segmentStartTime.roundToMs()
+                let newEndTime = segmentEndTime.roundToMs()
+                let adjustedTs = adjustedWordTimeStamps[0].with( start:newStartTime, end:newEndTime, isRebuilt:true)
+                adjustedWordTimeStamps[0] = adjustedTs
+                break
+            }
+
+            var leftBoundaryTime = (leftIndex > 0) ? adjustedWordTimeStamps[leftIndex - 1].end : segmentStartTime
+            var rightBoundaryTime = (rightIndex + 1 < totalCount) ? adjustedWordTimeStamps[rightIndex + 1].start : segmentEndTime
+
+            while rightBoundaryTime <= leftBoundaryTime + minimumEpsilon && (leftIndex > 0 || rightIndex + 1 < totalCount) {
+                if leftIndex > 0 {
+                    leftIndex -= 1
+                    leftBoundaryTime = (leftIndex > 0) ? adjustedWordTimeStamps[leftIndex - 1].end : segmentStartTime
+                }
+                if rightBoundaryTime <= leftBoundaryTime + minimumEpsilon, rightIndex + 1 < totalCount {
+                    rightIndex += 1
+                    rightBoundaryTime = (rightIndex + 1 < totalCount) ? adjustedWordTimeStamps[rightIndex + 1].start : segmentEndTime
+                }
+                if leftIndex == 0 && rightIndex == totalCount - 1 { break }
+            }
+
+            if rightBoundaryTime <= leftBoundaryTime + minimumEpsilon {
+                index += 1
+                continue
+            }
+
+            let windowStartTime = leftBoundaryTime
+            let windowEndTime = rightBoundaryTime
+            let windowDuration = windowEndTime - windowStartTime
+
+            let weightSum = adjustedWordTimeStamps[leftIndex...rightIndex].reduce(0.0) { $0 + Double($1.voiceLen) }
+            let useEqualWeights = weightSum <= 0.0
+            let windowTokenCount = rightIndex - leftIndex + 1
+
+
+            var cumulativeTime = 0.0
+            for k in leftIndex...rightIndex {
+                let weight = useEqualWeights ? (1.0 / Double(windowTokenCount)): Double(adjustedWordTimeStamps[k].voiceLen) / weightSum
+                let targetDuration = (k == rightIndex) ? (windowDuration - cumulativeTime) : windowDuration * weight
+                
+                let newStartTime = (windowStartTime + cumulativeTime).roundToMs()
+                cumulativeTime += targetDuration
+                let newEndTime = min(windowEndTime, windowStartTime + cumulativeTime).roundToMs()
+                
+                adjustedWordTimeStamps[k] = adjustedWordTimeStamps[k].with(start:newStartTime, end:newEndTime, isRebuilt: true/*, timeConfidence: 0.0*/ )
+            }
+
+            index = rightIndex + 1
+        }
+
+        return adjustedWordTimeStamps
     }
     
     func fixOutOfWhackDurations(
@@ -524,14 +604,21 @@ extension WhisperTranscriber {
         if totalVlens <= 0 {
             return (stamps, false)
         }
-
-        let expectedDurations = stamps.map { Double($0.voiceLen) / Double(totalVlens) * segmentDuration }
-        let actualDurations   = stamps.map { $0.end - $0.start }
-
-        let badCount = zip(expectedDurations, actualDurations)
-            .filter { abs($0 - $1) > tolerance }
-            .count
-
+        if stamps.count < 2 {
+            return (stamps, false)
+        }
+        if !force && stamps.count < 5 {
+            return (stamps, false)
+        }
+        
+        let badStamps = stamps.filter {
+            //if sessionConfig.granularity == .group && $0.timeConfidence > 0.04 {
+                //return false
+            //}
+            let expectedDur = Double($0.voiceLen) / Double(totalVlens) * segmentDuration
+            return abs( $0.duration - expectedDur) > tolerance
+        }
+        let badCount = badStamps.count        
         let badLimit = Int(Double(stamps.count) * 0.8)
         if force || badCount >= badLimit {
             var out = [WordTimeStamp]()
@@ -545,15 +632,8 @@ extension WhisperTranscriber {
                 let roundedStart = start.roundToMs()
                 let roundedEnd = end.roundToMs()
 
-                out.append(WordTimeStamp(
-                    token:            ts.token,
-                    start:            roundedStart,
-                    end:              roundedEnd,
-                    audioFile:        ts.audioFile,
-                    voiceLen:       ts.voiceLen,
-                    segmentIndex: ts.segmentIndex,
-                    tokenTypeGuess: ts.tokenTypeGuess
-                ))
+                let newTimeStamp = ts.with(start: roundedStart, end: roundedEnd, isRebuilt: true /*, timeConfidence: 0.0*/)
+                out.append( newTimeStamp )
             }
             return ( out, true )
         }
@@ -590,7 +670,9 @@ extension WhisperTranscriber {
 
             if j - i > 1 {
                 let rawNextStart: Double = j < count ? wordTimeStamps[j].start : segmentEnd
-                let bound = rawNextStart > prevEnd ? rawNextStart : segmentEnd
+                //let bound = rawNextStart > prevEnd ? rawNextStart : segmentEnd
+                let bound = (j < count) ? max(prevEnd, rawNextStart) : segmentEnd
+
                 let gap = max(0, bound - prevEnd)
                 let run = wordTimeStamps[i..<j]
                 let totalF = run.reduce(0) { $0 + $1.voiceLen }
@@ -606,15 +688,7 @@ extension WhisperTranscriber {
                         let roundedStart = start.roundToMs()
                         let roundedEnd = clampedEnd.roundToMs()
                         
-                        out.append(WordTimeStamp(
-                            token:            ts.token,
-                            start:            roundedStart,
-                            end:              roundedEnd,
-                            audioFile:        ts.audioFile,
-                            voiceLen:       ts.voiceLen,
-                            segmentIndex: ts.segmentIndex,
-                            tokenTypeGuess: ts.tokenTypeGuess
-                        ))
+                        out.append( ts.with( start:roundedStart, end:roundedEnd, isRebuilt: true ) )
                     }
                 }
                 else if totalF > 0 && gap == 0 && j == count {
@@ -628,18 +702,11 @@ extension WhisperTranscriber {
                         let roundedStart = start.roundToMs()
                         let roundedEnd = clampedEnd.roundToMs()
                         
-                        out.append(WordTimeStamp(
-                            token:            ts.token,
-                            start:            roundedStart,
-                            end:              roundedEnd,
-                            audioFile:        ts.audioFile,
-                            voiceLen:       ts.voiceLen,
-                            segmentIndex:  ts.segmentIndex,
-                            tokenTypeGuess: ts.tokenTypeGuess
-                        ))
+                        out.append( ts.with( start:roundedStart, end:roundedEnd, isRebuilt: true ) )
                     }
                 }
                 else {
+                    // There's no time to alot to these so just need to leave them alone. The confidences are already 0 anyway.
                     out.append(contentsOf: run)
                 }
             }
@@ -647,16 +714,7 @@ extension WhisperTranscriber {
                 let ts = wordTimeStamps[i]
                 let s = max(ts.start, prevEnd).roundToMs()
                 let e = min(ts.end, segmentEnd).roundToMs()
-                
-                out.append(WordTimeStamp(
-                    token:            ts.token,
-                    start:            s,
-                    end:              e,
-                    audioFile:        ts.audioFile,
-                    voiceLen:       ts.voiceLen,
-                    segmentIndex:  ts.segmentIndex,
-                    tokenTypeGuess: ts.tokenTypeGuess
-                ))
+                out.append( ts.with( start:s, end:e ))
             }
 
             i = j
@@ -695,7 +753,7 @@ extension WhisperTranscriber {
                         }
                         return false
                     }
-
+                    
                     if prevText.hasSuffix(numberSeparator) {
                         if text.trimmed().allSatisfy( { String($0) == numberSeparator || $0.isDigit } ) {
                             return true
@@ -714,63 +772,32 @@ extension WhisperTranscriber {
             groups[groups.count - 1].append(entry)
         }
         
-        /*
-        var splitGroups: [[WordTimeStamp]] = []
-        for (i, group) in groups.enumerated() {
-            // This splits off periods at the end of sentences. I'm not sure why. It's not a good idea for out purposes because it can cause alignment to shorten and skip the period
-            //let nextGroup = (i + 1 < groups.count) ? groups[i + 1] : nil
-            //if group.count > 1 && group.last?.token == "." && (nextGroup == nil || [" ", "["].contains(nextGroup!.first!.token.first!)) {
-            //splitGroups.append(Array(group.dropLast()))
-            //splitGroups.append([group.last!])
-            //} else {
-                splitGroups.append(group)
-            //}
-        }
-        groups = splitGroups
-        */
-        
         var result: [WordTimeStamp] = []
         for group in groups {
-            let groupText = group.map { $0.token }.joined()
-            if groupText.isEmpty { continue }
-            let startTime = group.first!.start
-            let endTime   = group.last!.end
-            let voiceLen = group.reduce(0) { $0 + $1.voiceLen }
+            guard let first = group.first else { continue }
             
-            let tokenTypeGuess:TokenTypeGuess = {
-                if groupText.isAllWhiteSpaceOrPunct {
+            let mergedBase = group.dropFirst().reduce(first) { acc, ts in
+                acc.merged(with: ts)
+            }
+            
+            if mergedBase.token.isEmpty { continue }
+            
+            let tokenTypeGuess: TokenTypeGuess = {
+                if mergedBase.token.isAllWhiteSpaceOrPunct {
                     return .whiteSpaceAndPunct
                 }
-                let trimmedGrp = groupText.trimmed()
-                if !trimmedGrp.isEmpty {
-                    if trimmedGrp.last! == "." {
-                        return .sentenceEnd
-                    }
-                    if trimmedGrp.first!.isUppercase {
-                        return .sentenceBegin
-                    }
+                let trimmedGrp = mergedBase.token.trimmed()
+                if trimmedGrp.last! == "." {
+                    return .sentenceEnd
                 }
-                
+                if trimmedGrp.first!.isUppercase {
+                    return .sentenceBegin
+                }
                 return .other
             }()
-
-            //let confidence: Double? = {
-            //  guard group.first?.confidence != nil else { return nil }
-            // return meanOfVector(group.compactMap { $0.confidence })
-            //}()
-
-            let entry = WordTimeStamp(
-                //type: "word",
-                //token: groupText.trim(),
-                token: groupText,
-                start: startTime,
-                end: endTime,
-                audioFile: group.first!.audioFile,
-                voiceLen: voiceLen,
-                segmentIndex: group.first!.segmentIndex,
+            
+            let entry = mergedBase.with(
                 tokenTypeGuess: tokenTypeGuess
-                //confidence: confidence,
-                //timeline: group
             )
             result.append(entry)
         }
@@ -778,7 +805,7 @@ extension WhisperTranscriber {
     }
 
     func isSeparatorCharacter(_ char: Character) -> Bool {
-        let nonSeparatingPunctuation: Set<Character> = ["'", "-", ".", "·", "•"]
+        let nonSeparatingPunctuation: Set<Character> = ["'", "-", ".","%", "·", "•"]
         //let nonSeparatingPunctuation: Set<Character> = ["'", "-", ".", "·", "•","\""]
         if nonSeparatingPunctuation.contains(char) { return false }
         return char.isWhitespace || char.isPunctuation
@@ -827,6 +854,9 @@ extension WhisperTranscriber {
         let normalizer = WordNormalizer()
         var offsetDelta = 0
         return wordTimeLine.map { wordTimeStamp in
+            if wordTimeStamp.tokenTypeGuess == .whiteSpaceAndPunct {
+                return wordTimeStamp
+            }
             let startOffset = wordTimeStamp.startOffset >= 0 ? wordTimeStamp.startOffset + offsetDelta : -1
             let endOffset = wordTimeStamp.endOffset >= 0 ? wordTimeStamp.endOffset + offsetDelta : -1
             let (normalizedWord, delta) = normalizer.normalizedWord(wordTimeStamp.token)
@@ -900,6 +930,7 @@ class WhisperFullParams {
         paramsPtr.pointee.suppress_nst = false
         paramsPtr.pointee.suppress_blank   = false
 
+        //paramsPtr.pointee.max_len = 1
         //paramsPtr.pointee.no_speech_thold  = 0.3
         //paramsPtr.pointee.logprob_thold   = -0.5
         //paramsPtr.pointee.entropy_thold = 2.0

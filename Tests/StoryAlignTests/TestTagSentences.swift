@@ -11,6 +11,9 @@ import SwiftSoup
 @testable import StoryAlignCore
 import Foundation
 
+fileprivate let sessionConfig = try! SessionConfig(sessionDir: nil, modelFile: "",  runStage: .transcribe, logger: TestsLogger(), audioLoaderType:.avfoundation,  reportType: .full)
+fileprivate let xmlTagger = XHTMLTagger(sessionConfig: sessionConfig)
+
 func normalize( xml:String ) throws -> String {
     //let doc = try XMLDocument(xmlString: xml, options:.documentTidyXML)
     let doc = try XMLDocument(xmlString: xml, options:.documentTidyXML)
@@ -26,8 +29,6 @@ func normalize( xml:String ) throws -> String {
 }
 
 class AppendTextNodeTests: XCTestCase {
-    let xmlTagger = XHTMLTagger()
-
     func testCanAppendTextNodesToEmptyParents() throws {
         let container = Element(Tag(""), "")
         var sentences = Set<Int>()
@@ -107,8 +108,6 @@ class AppendTextNodeTests: XCTestCase {
 }
 
 class TagSentencesTests: XCTestCase {
-    let xmlTagger = XHTMLTagger()
-
     func testCanTagSentences() throws {
         let xml = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -146,7 +145,7 @@ class TagSentencesTests: XCTestCase {
         </html>
         """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
 
@@ -173,7 +172,7 @@ class TagSentencesTests: XCTestCase {
         </html>
         """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -246,7 +245,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
 
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -308,7 +307,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -351,7 +350,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -394,7 +393,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -451,7 +450,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -500,7 +499,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -567,7 +566,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -595,7 +594,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -623,7 +622,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -651,7 +650,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -711,7 +710,7 @@ class TagSentencesTests: XCTestCase {
 """
         
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -751,7 +750,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
 
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -789,7 +788,7 @@ class TagSentencesTests: XCTestCase {
               </html>
         """
 
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -860,7 +859,7 @@ class TagSentencesTests: XCTestCase {
              </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -922,7 +921,7 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -991,7 +990,7 @@ class TagSentencesTests: XCTestCase {
              </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -1032,7 +1031,7 @@ class TagSentencesTests: XCTestCase {
        </html> 
        """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -1057,7 +1056,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         
@@ -1095,7 +1094,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1121,7 +1120,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1143,7 +1142,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1177,7 +1176,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1199,7 +1198,7 @@ class TagSentencesTests: XCTestCase {
             </html>
             """
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1222,7 +1221,7 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1250,7 +1249,7 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1278,7 +1277,7 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
@@ -1299,13 +1298,13 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
     }
     
-    func testPg1() throws {
+    func testFirstSentenceBlank() throws {
         let xml = """
             <body epub:type="bodymatter">
               <section epub:type="chapter" role="doc-chapter" aria-labelledby="ch1">
@@ -1328,7 +1327,7 @@ class TagSentencesTests: XCTestCase {
                   <span role="doc-pagebreak" epub:type="pagebreak" id="pg_1" aria-label="1"/>
                   <hgroup>
                     <h1 class="CHAPTER" id="ch1">
-                      <span id="chapter_one-sentence0"><span class="CN"><a href="contents.xhtml#c_ch1"><b>1</b></a></span><span class="CT"><a href="contents.xhtml#c_ch1"><b>PANIC! </b></a></span></span>
+                      <span id="chapter_one-sentence0"><span class="CN"><a href="contents.xhtml#c_ch1"><b>1</b></a></span> <span class="CT"><a href="contents.xhtml#c_ch1"><b>PANIC! </b></a></span></span>
                       <span id="chapter_one-sentence1"><span class="CT"><a href="contents.xhtml#c_ch1"><b>AT THE SPONSORAMA</b></a></span></span>
                     </h1>
                   </hgroup>
@@ -1336,12 +1335,180 @@ class TagSentencesTests: XCTestCase {
               </body>
             </html>
             """
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: xml)
+        let sentences = try xmlTagger.getXHtmlSentences(from: xml)
         let doc: Document = try SwiftSoup.parse(xml)
         let result = try xmlTagger.tag(sentences: sentences, in: doc, chapterId: "chapter_one")
         XCTAssert(result == expected)
     }
+    
+    func testTagWordsWithItalic() throws {
+        let xml = """
+        <div class="fmtx"><span id="kobo.110.1" class="calibre3">A woman <i class="calibre7">could</i> change the world.</span></div>
+        """
+        let words = ["A woman ","could ", "change ", "the ", "world."]
+        let expected = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <html>
+          <head/>
+          <body>
+            <div class="fmtx">
+              <span id="kobo.110.1" class="calibre3"><span id="chapter_one-sentence0">A woman </span><span id="chapter_one-sentence1"><i class="calibre7">could</i></span> <span id="chapter_one-sentence2">change </span><span id="chapter_one-sentence3">the </span><span id="chapter_one-sentence4">world.</span></span>
+            </div>
+          </body>
+        </html>
+        """
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: words, in: doc, chapterId: "chapter_one")
+        
+        XCTAssert(result == expected)
+    }
 
+    func testTagWordsWithItalic2() throws {
+        let xml = """
+        <div class="fmtx"><i class="calibre7"><span id="kobo.52.1" class="calibre3">It is about your sister</span></i><span id="kobo.52.2" class="calibre3">, the poet had said.</span></div>
+        """
+        let words = Tokenizer().tokenizeWords(text: "It is about your sister, the poet had said.")
+        let expected = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <html>
+          <head/>
+          <body>
+            <div class="fmtx">
+              <span id="kobo.52.1" class="calibre3"><span id="chapter_one-sentence0"><i class="calibre7">It </i></span><span id="chapter_one-sentence1"><i class="calibre7">is </i></span><span id="chapter_one-sentence2"><i class="calibre7">about </i></span><span id="chapter_one-sentence3"><i class="calibre7">your </i></span><span id="chapter_one-sentence4"><i class="calibre7">sister</i></span></span>
+              <span id="kobo.52.2" class="calibre3">, <span id="chapter_one-sentence5">the </span><span id="chapter_one-sentence6">poet </span><span id="chapter_one-sentence7">had </span><span id="chapter_one-sentence8">said.</span></span>
+            </div>
+          </body>
+        </html>
+        """
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: words, in: doc, chapterId: "chapter_one")
+        
+        XCTAssert(result == expected)
+    }
+    
+    func testTagWordGroupsWithItalic() throws {
+        let xml = """
+            <p><i>One of the doctors</i> <span role="doc-pagebreak" epub:type="pagebreak" id="pg_231" aria-label=" Page 231. "/><i>that works here is known for being generous with prescriptions.</i></p>
+        """
+        let words = [
+            "One of the doctors that works here ",
+            "is known for ",
+            "being ",
+            "generous with prescriptions."
+        ]
+        let expected = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <html>
+          <head/>
+          <body>
+            <p>
+              <span id="chapter_one-sentence0"><i>One of the doctors</i> <span role="doc-pagebreak" epub:type="pagebreak" id="pg_231" aria-label=" Page 231. "/><i>that works here </i></span>
+              <span id="chapter_one-sentence1"><i>is known for </i></span>
+              <span id="chapter_one-sentence2"><i>being </i></span>
+              <span id="chapter_one-sentence3"><i>generous with prescriptions.</i></span>
+            </p>
+          </body>
+        </html>
+        """
+        let doc: Document = try SwiftSoup.parse(xml)
+        let result = try xmlTagger.tag(sentences: words, in: doc, chapterId: "chapter_one")
+        
+        XCTAssert(result == expected)
+    }
+    
+    /*
+     * This doesn't work quite right. It adds the space before the <br/>
+    func testTagWordGroupsWithBr() throws {
+        let xml = """
+        <blockquote>
+        <p class="EXF1"><span class="eSANS_Caflisch_Script_Pro_Light_11">I have made a mistake, one I hope I will be able to correct.</span>
+        <br/>&#x2005;&#x2005;&#x2005;&#x2005;&#x2005;<span class="eSANS_Caflisch_Script_Pro_Light_11">If I can&#x2019;t have Red, then I will have to kill him.</span></p>
+        </blockquote>
+        """
+        
+        let doc: Document = try SwiftSoup.parse(xml)
+        let words = [
+            "I have ",
+            "made a mistake, ",
+            "one I hope I will be able to ",
+            "correct. &#x2005;&#x2005;&#x2005;&#x2005;&#x2005;",
+            "If I can’t ",
+            "have Red, ",
+            "then I will ",
+            "have to kill ",
+            "him."
+        ]
+
+        let expected = """
+
+        """
+        let result = try xmlTagger.tag(sentences: words, in: doc, chapterId: "chapter_one")
+
+        XCTAssert(result == expected)
+    }*/
+    
+    /*
+     <i>One of the doctors</i> <span role="doc-pagebreak" epub:type="pagebreak" id="pg_231" aria-label=" Page 231. "/><i>that works here is known for being generous with prescriptions.</i></p>
+     */
+    
+    
+    func testEmptySpansCheck() throws {
+        let xml = """
+            <html>
+             <head></head>
+             <body>
+              <div class="fmtx">
+               <span id="chapter_one-sentence0">
+                <span id="kobo.52.1" class="calibre3">
+                 <i class="calibre7">
+                  It 
+                 </i>
+                 <i class="calibre7">
+                  is 
+                 </i>
+                 <i class="calibre7">
+                  about 
+                 </i>
+                 <i class="calibre7">
+                  your 
+                 </i>
+                 <i class="calibre7">
+                  sister
+                 </i>
+                </span>
+               </span>
+               <span id="chapter_one-sentence1"></span>
+               <span id="chapter_one-sentence2"></span>
+               <span id="chapter_one-sentence3"></span>
+               <span id="kobo.52.2" class="calibre3">
+                <span id="chapter_one-sentence4">
+                 , 
+                </span>
+                <span id="chapter_one-sentence5">
+                 the 
+                </span>
+                <span id="chapter_one-sentence6">
+                 poet 
+                </span>
+                <span id="chapter_one-sentence7">
+                 had 
+                </span>
+                <span id="chapter_one-sentence8">
+                 said.
+                </span>
+               </span>
+              </div>
+             </body>
+            </html>
+            """
+        
+        let doc: Document = try SwiftSoup.parse(xml)
+        let emptySpans = try xmlTagger.findEmptySentenceSpans(in: doc)
+        XCTAssertEqual(emptySpans.count, 3)
+    }
 }
+
+
+
 
 

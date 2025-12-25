@@ -11,9 +11,12 @@ import XCTest
 @testable import StoryAlignCore
 import Foundation
 
+
+fileprivate let sessionConfig = try! SessionConfig(sessionDir: nil, modelFile: "",  runStage: .transcribe, logger: TestsLogger(), audioLoaderType:.avfoundation,  reportType: .full)
+fileprivate let xmlTagger = XHTMLTagger(sessionConfig: sessionConfig)
+
+
 class TestGetXhtmlSentences: XCTestCase {
-    let tagger = XHTMLTagger()
-    
     func testGetSentencesFromTextNode() throws {
         let htmlString = """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -34,7 +37,7 @@ class TestGetXhtmlSentences: XCTestCase {
             "Well, three, at least. ",
         ]
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: htmlString)
+        let sentences = try xmlTagger.getXHtmlSentences(from: htmlString)
         
         XCTAssertEqual(sentences, expected)
     }
@@ -63,7 +66,7 @@ class TestGetXhtmlSentences: XCTestCase {
             "In fact, five! ",
         ]
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: htmlString)
+        let sentences = try xmlTagger.getXHtmlSentences(from: htmlString)
         
         XCTAssertEqual(sentences, expected)
     }
@@ -97,7 +100,7 @@ class TestGetXhtmlSentences: XCTestCase {
             " will be broken up, since it crosses multiple blocks. "
         ]
         
-        let sentences = try XHTMLTagger().getXHtmlSentences(from: htmlString)
+        let sentences = try xmlTagger.getXHtmlSentences(from: htmlString)
         
         XCTAssertEqual(sentences, expected)
     }

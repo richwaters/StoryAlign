@@ -28,4 +28,7 @@ extension TestExtras {
     func testLionsOfAlRassan() async throws {
         try await runTest(for: "The_Lions_of_Al-Rassan")
     }
+    func testThiefOfNight() async throws {
+        try await runTest(for: "Thief_of_Night")
+    }
 }

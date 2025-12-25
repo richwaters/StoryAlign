@@ -89,7 +89,7 @@ public struct EpubParser : SessionConfigurable {
             let xmlData = try Data(contentsOf: url)
             item.xmlData = xmlData
             (item.text, item.hasScript) = try parseText(from:xmlData )
-            item.xhtmlSentences = try XHTMLTagger().getXHtmlSentences(from: item.xmlText)
+            item.xhtmlSentences = try XHTMLTagger(sessionConfig: sessionConfig).getXHtmlSentences(from: item.xmlText)
 
             guard let spineItem = spindItemsByIdRef[item.id] else {
                 throw StoryAlignError("Cannot find spine item for \(item.id)")

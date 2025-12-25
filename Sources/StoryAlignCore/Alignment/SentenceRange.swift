@@ -21,8 +21,8 @@ enum SentenceMatchType : Int, Codable {
 }
 
 public struct AlignedSentence : Codable,Sendable {
-    let chapterSentence:String
-    let chapterSentenceId:Int
+    let xhtmlSentence:String
+    let sentenceId:Int
     let sentenceRange:SentenceRange
     let matchText:String?
     let matchOffset:Int?
@@ -30,17 +30,17 @@ public struct AlignedSentence : Codable,Sendable {
     var sharedTimeStamp = false
 
     func with(
-        chapterSentence: String? = nil,
-        chapterSentenceId: Int? = nil,
+        xhtmlSentence: String? = nil,
+        sentenceId: Int? = nil,
         sentenceRange: SentenceRange? = nil,
         matchText: String? = nil,
         matchOffset: Int? = nil,
         matchType: SentenceMatchType? = nil,
         sharedTimeStamp: Bool? = nil
     ) -> Self {
-        .init(
-            chapterSentence: chapterSentence ?? self.chapterSentence,
-            chapterSentenceId: chapterSentenceId ?? self.chapterSentenceId,
+        return AlignedSentence(
+            xhtmlSentence: xhtmlSentence ?? self.xhtmlSentence,
+            sentenceId: sentenceId ?? self.sentenceId,
             sentenceRange: sentenceRange ?? self.sentenceRange,
             matchText: matchText ?? self.matchText,
             matchOffset: matchOffset ?? self.matchOffset,
@@ -49,37 +49,42 @@ public struct AlignedSentence : Codable,Sendable {
         )
     }
     
-    var chapterSentenceWords:[String] {
-        chapterSentence.components(separatedBy: " ")
+    var xhtmlSentenceWords:[String] {
+        Tokenizer().tokenizeWords(text: xhtmlSentence)
+        //chapterSentence.components(separatedBy: " ")
+    }
+    
+    var normalizedSentence:String {
+        WordNormalizer().normalizeWordsInSentence(xhtmlSentence)
     }
     
     var secondsPerWord:Double {
-        if chapterSentenceWords.isEmpty {
+        if xhtmlSentenceWords.isEmpty {
             return 0.0
         }
-        let secondsPerWord = sentenceRange.duration / Double(chapterSentenceWords.count)
+        let secondsPerWord = sentenceRange.duration / Double(xhtmlSentenceWords.count)
         return secondsPerWord
     }
     var secondsPerChar:Double {
-        if chapterSentence.isEmpty {
+        if xhtmlSentence.isEmpty {
             return 0.0
         }
-        let secondsPerChar = sentenceRange.duration / Double(chapterSentence.count)
+        let secondsPerChar = sentenceRange.duration / Double(xhtmlSentence.count)
         return secondsPerChar
     }
     
     var secondsPerVlen:Double {
-        if chapterSentence.isEmpty {
+        if xhtmlSentence.isEmpty {
             return 0.0
         }
-        let secondsPerChar = sentenceRange.duration / chapterSentence.voiceLength
+        let secondsPerChar = sentenceRange.duration / xhtmlSentence.voiceLength
         return secondsPerChar
     }
 }
 
 extension AlignedSentence : CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
-        "\(chapterSentenceId): \(chapterSentence) -- Transcription sentenceRange \(sentenceRange)"
+        "\(sentenceId): \(xhtmlSentence) -- Transcription sentenceRange \(sentenceRange)"
     }
     
     public var debugDescription: String {

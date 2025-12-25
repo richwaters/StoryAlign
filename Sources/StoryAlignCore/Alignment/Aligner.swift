@@ -83,6 +83,11 @@ public struct Aligner : SessionConfigurable, Sendable {
     
     public func align( ebook:EpubDocument, AudioBook:AudioBook, rawTranscriptions:[RawTranscription] ) async throws -> [AlignedChapter] {
         
+        let rawSegs = rawTranscriptions.flatMap(\.segments)
+        logger.log(.debug, "Raw segments" )
+        rawSegs.enumerated().forEach { (index,seg) in
+            logger.log(.debug, "Segment \(index): \(seg.description)", indentLevel: 1)
+        }
         let transcriber = TranscriberFactory.transcriber(forSessionConfig: sessionConfig)
         let transcriptions = try rawTranscriptions.map { try transcriber.buildTranscription(from: $0) }
         
@@ -160,6 +165,8 @@ public struct Aligner : SessionConfigurable, Sendable {
             manifestItems = sortedManifest
         }
         
+        //manifestItems = manifestItems.filter { $0.id == "c03" }
+        
         let ebookSentenceCount = manifestItems.reduce(0) { $0 + ($1.xhtmlSentences.count) }
         progressUpdate(0, epubSentenceCount:ebookSentenceCount)
 
@@ -212,7 +219,7 @@ public struct Aligner : SessionConfigurable, Sendable {
             defer {
                 lastAlignedSentence = alignedItem.alignedSentences.last!
             }
-            guard firstAlignedSentence.chapterSentenceId != 0 else {
+            guard firstAlignedSentence.sentenceId != 0 else {
                 return alignedItem
             }
 
@@ -231,13 +238,13 @@ public struct Aligner : SessionConfigurable, Sendable {
                 }
             }
 
-            let chapterSentences = alignedItem.manifestItem.xhtmlSentences.prefix(firstAlignedSentence.chapterSentenceId)
+            let chapterSentences = Array(alignedItem.manifestItem.xhtmlSentences.prefix(firstAlignedSentence.sentenceId))
             if chapterSentences.isEmpty {
                 return alignedItem
             }
             
-            let normalizedChapterSentences = try normalize(sentences: Array(chapterSentences) )
-            let (alignedSentences, _, _ ) = alignSentences( manifestItemName:alignedItem.manifestItem.nameOrId, chapterStartSentence: 0, chapterSentences: normalizedChapterSentences, transcription: fullTranscription, startingTransOffset: startTransOffset )
+            //let normalizedChapterSentences = try normalize(sentences: Array(chapterSentences) )
+            let (alignedSentences, _, _ ) = try alignSentences( manifestItemName:alignedItem.manifestItem.nameOrId, chapterStartSentence: 0, xhtmlSentences: chapterSentences, transcription: fullTranscription, startingTransOffset: startTransOffset )
             guard alignedSentences.isEmpty == false else {
                 return alignedItem
             }
@@ -247,7 +254,18 @@ public struct Aligner : SessionConfigurable, Sendable {
         }
         
         let refined = try finalize(alignedItems: alignedItems, transcription: fullTranscription)
-        return refined
+        if !sessionConfig.granularity!.useWordTokenizer {
+            return refined
+        }
+        
+        let wordAlignedChapters = await WordAligner(sessionConfig: sessionConfig).alignWords(in: refined)
+        // Need to do this so misalignments don't cause epubcheck to fail
+        let refinedWordAlignedChapters = wordAlignedChapters.map {
+            let nuSentences = expandEmptySentenceRanges(alignedSentences: $0.alignedWords, segments:fullTranscription.segments).0
+            let nuAlignedItem = $0.with(alignedWords: nuSentences)
+            return nuAlignedItem
+        }
+        return refinedWordAlignedChapters
     }
 
 }
@@ -260,15 +278,15 @@ extension Aligner {
         logger.log(.info, "Aligning \(manifestItem.nameOrId)")
 
         let transcriptionTxt = transcription.transcription
-        let chapterSentences = try normalize(sentences: manifestItem.xhtmlSentences)
+        let normalizedXhtmlSentences = try normalize(sentences: manifestItem.xhtmlSentences)
         
-        if chapterSentences.isEmpty {
+        if normalizedXhtmlSentences.isEmpty {
             logger.log(.info, "\(manifestItem.id) has no text; skipping")
             return nil
         }
         
-        if chapterSentences.count < 2 {
-            if (chapterSentences.first ?? "").split(separator: " ").count < 4 {
+        if normalizedXhtmlSentences.count < 2 {
+            if (normalizedXhtmlSentences.first ?? "").split(separator: " ").count < 4 {
                 logger.log(.info, "\(manifestItem.id) has fewer than four words; skipping")
                 return nil
             }
@@ -280,10 +298,10 @@ extension Aligner {
             guard let transcriptionNGramIndex else {
                 let startsAfterOffset = usedOffsets.startsAfter(index: manifestItem.spineItemIndex)
                 let endsBeforeOffset = usedOffsets.endsBefore(index: manifestItem.spineItemIndex)
-                return findBestOffset(manifestItemId:manifestItem.id, epubChapterSentences: chapterSentences, transcriptionText: transcriptionTxt, startsAfterOffset: startsAfterOffset, endsBeforeOffset: endsBeforeOffset)
+                return findBestOffset(manifestItemId:manifestItem.id, epubChapterSentences: normalizedXhtmlSentences, transcriptionText: transcriptionTxt, startsAfterOffset: startsAfterOffset, endsBeforeOffset: endsBeforeOffset)
             }
             //return findBestOffset2(manifestItemId:manifestItem.id, epubChapterSentences: chapterSentences, transcription:transcription, startsAfterOffset: startsAfterOffset, endsBeforeOffset: endsBeforeOffset, index: transcriptionNGramIndex)
-            return findBestOffset2(manifestItem:manifestItem, epubChapterSentences: chapterSentences, transcription:transcription, usedOffsets:usedOffsets, index: transcriptionNGramIndex)
+            return findBestOffset2(manifestItem:manifestItem, epubChapterSentences: normalizedXhtmlSentences, transcription:transcription, usedOffsets:usedOffsets, index: transcriptionNGramIndex)
         }()
         
         
@@ -295,7 +313,7 @@ extension Aligner {
         usedOffsets.markUsed(index: manifestItem.spineItemIndex, start: startTranscriptionOffset, end: 0)
 
         
-        let (alignedSentences, skippedSentences, endTranscriptionOffset ) = alignSentences( manifestItemName:manifestItem.nameOrId, chapterStartSentence: startSentence, chapterSentences: chapterSentences, transcription: transcription, startingTransOffset: startTranscriptionOffset )
+        let (alignedSentences, skippedSentences, endTranscriptionOffset ) = try alignSentences( manifestItemName:manifestItem.nameOrId, chapterStartSentence: startSentence, xhtmlSentences: manifestItem.xhtmlSentences, transcription: transcription, startingTransOffset: startTranscriptionOffset )
 
         logger.log(.debug, "Found chapter starrt for \(manifestItem.id) at \(startTranscriptionOffset)")
         logger.log(.debug, "Found end for \(manifestItem.id) at \(endTranscriptionOffset)")
@@ -315,36 +333,36 @@ extension Aligner {
     public func finalize(alignedItems: [AlignedChapter], transcription:Transcription) throws -> [AlignedChapter] {
         var lastSentenceRange:SentenceRange? = nil
         
-        let refinedAlignedItems = try alignedItems.map { alignedItem in
+        let refinedAlignedItems = alignedItems.map { alignedItem in
             if alignedItem.isEmpty || alignedItem.alignedSentences.isEmpty {
                 return alignedItem
             }
 
             let doRefine = { (alignedItem:AlignedChapter ) -> AlignedChapter in
-                let chapterSentences = try normalize(sentences: alignedItem.manifestItem.xhtmlSentences)
-                let (refined,rebuilt) = refine(alignSentences: alignedItem.alignedSentences, lastSentenceRange:lastSentenceRange, transcription:transcription, chapterSentences: chapterSentences)
+                //let chapterSentences = try normalize(sentences: alignedItem.manifestItem.xhtmlSentences)
+                let (refined,rebuilt) = refine(alignSentences: alignedItem.alignedSentences, lastSentenceRange:lastSentenceRange, transcription:transcription, xhtmlSentences: alignedItem.manifestItem.xhtmlSentences)
                 lastSentenceRange = refined.last?.sentenceRange
                 return alignedItem.with(alignedSentences: refined, rebuiltSentences: rebuilt)
             }
             
             
             let firstSentence = alignedItem.alignedSentences.first!
-            if firstSentence.chapterSentenceId != 0 {
-                return try doRefine(alignedItem)
+            if firstSentence.sentenceId != 0 {
+                return doRefine(alignedItem)
             }
             
             guard let last = lastSentenceRange else {
                 firstSentence.sentenceRange.start = 0
-                return try doRefine(alignedItem)
+                return doRefine(alignedItem)
             }
             
             if firstSentence.sentenceRange.audioFile.filePath == last.audioFile.filePath  {
                 last.end = firstSentence.sentenceRange.start
-                return try doRefine(alignedItem)
+                return doRefine(alignedItem)
             }
             last.end = last.audioFile.duration
             firstSentence.sentenceRange.start = 0
-            return try doRefine(alignedItem)
+            return doRefine(alignedItem)
         }
         lastSentenceRange?.end = lastSentenceRange?.audioFile.duration ?? 0
         
@@ -354,6 +372,9 @@ extension Aligner {
     func normalize( sentences:[String] ) throws  -> [String] {
         let wordNormalizer = WordNormalizer()
         let chapterSentences = sentences.map { wordNormalizer.normalizeWordsInSentence($0).collapseWhiteSpace().trimmed() }
+        if chapterSentences.count != sentences.count {
+            logger.log( .debug, "Some sentences were empty after normalization. This should not happen.")
+        }
         return chapterSentences
     }
 
@@ -480,10 +501,11 @@ private extension Aligner {
 
 extension Aligner {
     func progressUpdate(_ incr:Int, epubSentenceCount:Int? = nil) {
-        sessionConfig.progressUpdater?.updateProgress(for: .align, msgPrefix: "Aligned", increment: incr, total: epubSentenceCount, unit: .sentences)
+        let unit:ProgressUpdaterUnit = sessionConfig.granularity == .phrase ? .phrases : .sentences
+        sessionConfig.progressUpdater?.updateProgress(for: .align, msgPrefix: "Aligning", increment: incr, total: epubSentenceCount, unit: unit)
     }
     
-    func alignSentences( manifestItemName:String, chapterStartSentence: Int, chapterSentences: [String], transcription: Transcription, startingTransOffset: Int ) -> (alignedSentences: [AlignedSentence], skippedSentences:[SkippedSentence], transcriptionOffset: Int) {
+    func alignSentences( manifestItemName:String, chapterStartSentence: Int, xhtmlSentences: [String], transcription: Transcription, startingTransOffset: Int ) throws -> (alignedSentences: [AlignedSentence], skippedSentences:[SkippedSentence], transcriptionOffset: Int) {
         var alignedSentences: [AlignedSentence] = []
         var skippedSentences:[SkippedSentence] = []
 
@@ -503,8 +525,9 @@ extension Aligner {
             return cleaned.count <= 3
         }
         
-        let filteredChapterSentences: [(Int, String)] = chapterSentences.enumerated().filter { (index, sentence) in
-            let cleaned = sentence.filter { !charactersToRemove.contains($0) }
+        let filteredChapterSentences: [(Int, String)] = try xhtmlSentences.enumerated().filter { (index, sentence) in
+            let normalizedSentence = try normalize(sentences:[sentence]).first!
+            let cleaned = normalizedSentence.filter { !charactersToRemove.contains($0) }
             if cleaned.count == 0 {
             //if cleaned.count <= 3 {
             //if cleaned.count < 3 {
@@ -538,7 +561,9 @@ extension Aligner {
             let safeOffset = min(transcriptionWindowOffset, safeRaw.count)
             let transcriptionWindow = String(safeRaw.dropFirst(safeOffset))
             
-            let query = sentence.trimmed().collapseWhiteSpace().lowercased()
+            let normalizedSentence = try! normalize(sentences: [sentence]).first!
+            let query = normalizedSentence.trimmed().collapseWhiteSpace().lowercased()
+
             let smallQuerySpecialCase = query.split(separator: " ").count <= 3 && query.count < 20
             let hardMaxWindowSize = smallQuerySpecialCase ? 3 :  windowSize
 
@@ -571,6 +596,11 @@ extension Aligner {
                 
                 logger.log(.debug, "Seed:\(ws) Haystack size: \(haystack.count)")
 
+                /*
+                if manifestItemName == "chapter21" && sentenceIndex == 49 {
+                    let a = 1
+                }*/
+
                 if haystack.starts(with: query) {
                     foundMatch = (0, query, .exact)
                     break
@@ -593,6 +623,7 @@ extension Aligner {
                     foundMatch = (offset, matched, .ignoringAllPunctuation)
                     break
                 }
+
                 if tooShort {
                     break;
                 }
@@ -606,7 +637,7 @@ extension Aligner {
                 }
             }
             
-            guard let firstMatch = foundMatch else {
+            guard var firstMatch = foundMatch else {
                 sentenceIndex += 1
                 notFound += 1
                 
@@ -633,8 +664,6 @@ extension Aligner {
                 continue
             }
             
-
-            
             if notFound > 0 {
                 let skipped = filteredChapterSentences[(sentenceIndex - notFound)..<sentenceIndex]
                 skippedSentences += skipped.map { (sentenceId,sentence) in
@@ -652,9 +681,10 @@ extension Aligner {
                 continue
             }
 
-            var matchEndOffset = firstMatch.index + firstMatch.match.count + transcriptionOffset + transcriptionWindowOffset + startingTransOffset
+            //var matchEndOffset = firstMatch.index + firstMatch.match.count + transcriptionOffset + transcriptionWindowOffset + startingTransOffset
             if firstMatch.match.last == " " && firstMatch.match.count > 1 {
-                matchEndOffset -= 1
+                //matchEndOffset -= 1
+                firstMatch.match.removeLast()
             }
             var start = startResult.start
             let audiofile = startResult.audioFile
@@ -708,7 +738,7 @@ extension Aligner {
             let timeStamps = Array(transcription.wordTimeline[startResult.index ... endTimeStamp.index])
 
             let sentenceRange = SentenceRange(id: sentenceId, start: start, end: endValue, audioFile: audiofile, timeStamps: timeStamps)
-            let alignedSentence = AlignedSentence(chapterSentence: sentence, chapterSentenceId: sentenceId, sentenceRange: sentenceRange, matchText: foundMatch?.match, matchOffset: foundMatch?.index, matchType: foundMatch?.matchType, sharedTimeStamp: sharedTimeStamp)
+            let alignedSentence = AlignedSentence(xhtmlSentence: xhtmlSentences[sentenceId], sentenceId: sentenceId, sentenceRange: sentenceRange, matchText: foundMatch?.match, matchOffset: foundMatch?.index, matchType: foundMatch?.matchType, sharedTimeStamp: sharedTimeStamp)
             alignedSentences.append(alignedSentence)
             progressUpdate(1)
 
@@ -827,6 +857,72 @@ extension Aligner {
         return startHAfterPunct..<h
     }
     
+    func stemPronounContraction(_ token: String) -> String {
+        guard let i = token.firstIndex(where: { $0 == "'" || $0 == "’" }) else {
+            return token
+        }
+        let left = String(token[..<i])
+        let right = String(token[token.index(after: i)...])
+        let pronouns: Set<String> = ["i","you","he","she","it","we","they"]
+        let safeSuffixes: Set<String> = ["ll","re","ve","d","m"]
+        if pronouns.contains(left.trimmed()) && safeSuffixes.contains(right.trimmed()) {
+            return left.trimmed()
+        }
+        return token
+    }
+    
+    func rangeExactMatchIgnoringAllPunctuation(in haystack: String, query: String) -> Range<String.Index>? {
+        
+        let queryWords = Tokenizer().tokenizeWords(text: query)
+        let stemmedQuery = queryWords.map { stemPronounContraction($0) }.joined()
+        let queryWithoutWhiteSpaceAndPunct = stemmedQuery.removeWhiteSpace().removePunctuation()
+        //let queryWithoutWhiteSpaceAndPunct = query.removeWhiteSpace().removePunctuation()
+        
+        let haystackWords = Tokenizer().tokenizeWords(text: haystack)
+        let stemmedHaystack = haystackWords.map { stemPronounContraction($0) }.joined()
+        let haystackWithoutWhiteSpaceAndPunct = stemmedHaystack.removeWhiteSpace().removePunctuation()
+        //let haystackWithoutWhiteSpaceAndPunct = haystack.removeWhiteSpace().removePunctuation()
+        
+        if queryWithoutWhiteSpaceAndPunct.isEmpty || haystackWithoutWhiteSpaceAndPunct.isEmpty {
+            return nil
+        }
+        
+        if !haystackWithoutWhiteSpaceAndPunct.starts(with: queryWithoutWhiteSpaceAndPunct) {
+            return nil
+        }
+        
+        var composedHayStack = ""
+        var hayStackWordIndex = 0
+        //let haystackWords = Tokenizer().tokenizeWords(text: haystack)
+        for haystackWord in haystackWords {
+            let stemmedHaystackWord = stemPronounContraction(haystackWord)
+            //composedHayStack += haystackWord.removeWhiteSpace().removePunctuation()
+            composedHayStack += stemmedHaystackWord.removeWhiteSpace().removePunctuation()
+            if composedHayStack == queryWithoutWhiteSpaceAndPunct {
+                break
+            }
+            hayStackWordIndex += 1
+        }
+        if composedHayStack != queryWithoutWhiteSpaceAndPunct {
+            return nil
+        }
+        let words = haystackWords.prefix(hayStackWordIndex + 1)
+        let joinedWords = words.joined()
+        
+        var startIndex = haystack.startIndex
+        var leadingPunctCount = 0
+        while startIndex < haystack.endIndex && (haystack[startIndex].isPunctuation || haystack[startIndex].isWhitespace) {
+            startIndex = haystack.index(after: startIndex)
+            leadingPunctCount += 1
+        }
+        if leadingPunctCount >= joinedWords.count {
+            return nil
+        }
+        
+        let endIndex = haystack.index(startIndex, offsetBy: joinedWords.count - leadingPunctCount)
+        return startIndex..<endIndex
+    }
+    /*
     func rangeExactMatchIgnoringAllPunctuation(in haystack: String, query: String) -> Range<String.Index>? {
         let endPunctCount = query.reversed().prefix { $0.isPunctuation }.count
         let leadPunctCount = query.prefix { $0.isPunctuation }.count
@@ -900,7 +996,7 @@ extension Aligner {
         }
         
         return startHAfterPunct..<h
-    }
+    }*/
 
     // Binary search helper: finds the first index in `timeline` where predicate is true.
     private func lowerBound(in timeline: [WordTimeStamp], where predicate: (WordTimeStamp) -> Bool) -> Int {
@@ -1009,8 +1105,8 @@ extension Aligner {
         "[_MISSING_TIMESTAMP_IDENTIFIER_]"
     }
     
-    func refine( alignSentences:[AlignedSentence], lastSentenceRange:SentenceRange?, transcription:Transcription, chapterSentences:[String] ) -> (all:[AlignedSentence], rebuilt:[AlignedSentence]) {
-        let interpolated = interpolateSentenceRanges(alignedSentences: alignSentences, chapterSentences: chapterSentences, lastSentenceRange: lastSentenceRange)
+    func refine( alignSentences:[AlignedSentence], lastSentenceRange:SentenceRange?, transcription:Transcription, xhtmlSentences:[String] ) -> (all:[AlignedSentence], rebuilt:[AlignedSentence]) {
+        let interpolated = interpolateSentenceRanges(alignedSentences: alignSentences, xhtmlSentences: xhtmlSentences, lastSentenceRange: lastSentenceRange)
         let withOffsets = fillInOffsets(interpolated, using: transcription.wordTimeline)
         let (expanded, rebuilt) = expandEmptySentenceRanges(alignedSentences: withOffsets, segments: transcription.segments)
         return (expanded, rebuilt)
@@ -1019,23 +1115,23 @@ extension Aligner {
 
     ///////////////
     ///
-    func makeInterpolated( start: Double, duration:TimeInterval, startSentenceIndex:Int, count: Int,  chapterSentences:[String], audioFile: AudioFile) -> [AlignedSentence]  {
+    func makeInterpolated( start: Double, duration:TimeInterval, startSentenceIndex:Int, count: Int,  xhtmlSentences:[String], audioFile: AudioFile) -> [AlignedSentence]  {
         
-        let missingSentences = chapterSentences[startSentenceIndex ..< startSentenceIndex + count]
+        let missingSentences = xhtmlSentences[startSentenceIndex ..< startSentenceIndex + count]
         let totalVlen = missingSentences.reduce(0.0) { $0 + $1.voiceLength }
         let secondsPerVlen = duration / totalVlen
 
         var lastStart = start
         let endIndex = startSentenceIndex + count
         let interpolatedSentences = (startSentenceIndex ..< endIndex).map {  index in
-            let chapterSentence = index < chapterSentences.count ? chapterSentences[index] : ""
-            let vlen = chapterSentence.voiceLength
+            let xhtmlSentence = index < xhtmlSentences.count ? xhtmlSentences[index] : ""
+            let vlen = xhtmlSentence.voiceLength
             let interpolatedLength = count == 1 ? duration : vlen*secondsPerVlen
             
             let missingStart =  lastStart
             let missingEnd = missingStart + interpolatedLength
             lastStart = missingEnd
-            let wordTimeStamp = WordTimeStamp(token: missingTimeStampToken, start: missingStart, end: missingEnd, audioFile: audioFile, voiceLen: vlen, segmentIndex: -1, tokenTypeGuess: .missing)
+            let wordTimeStamp = WordTimeStamp(token: missingTimeStampToken, start: missingStart, end: missingEnd, audioFile: audioFile, transcriptionTokens: [], /*voiceLen: vlen,*/ segmentIndex: -1, tokenTypeGuess: .missing, isInterpolated: true)
             
             let newRange = SentenceRange(
                 id: index,
@@ -1044,14 +1140,14 @@ extension Aligner {
                 audioFile: audioFile,
                 timeStamps: [wordTimeStamp]
             )
-            let nuSentence = AlignedSentence(chapterSentence:chapterSentence, chapterSentenceId: index, sentenceRange: newRange, matchText: nil, matchOffset: nil, matchType: .interpolated)
+            let nuSentence = AlignedSentence(xhtmlSentence:xhtmlSentence, sentenceId: index, sentenceRange: newRange, matchText: nil, matchOffset: nil, matchType: .interpolated)
             return nuSentence
         }
 
         return interpolatedSentences
     }
     
-    func interpolateSentenceRanges(alignedSentences: [AlignedSentence], chapterSentences:[String], lastSentenceRange: SentenceRange?) -> [AlignedSentence] {
+    func interpolateSentenceRanges(alignedSentences: [AlignedSentence], xhtmlSentences:[String], lastSentenceRange: SentenceRange?) -> [AlignedSentence] {
 
         if alignedSentences.isEmpty {
             return []
@@ -1086,7 +1182,7 @@ extension Aligner {
             
             let startPoint = crossesAudioBoundary ? 0.0 : lastSentenceRange!.end
             if diff > 0 {
-                let interpolatedSentences = makeInterpolated(start: startPoint, duration: diff, startSentenceIndex: 0, count: count,chapterSentences: chapterSentences, audioFile: firstSentenceRange.audioFile)
+                let interpolatedSentences = makeInterpolated(start: startPoint, duration: diff, startSentenceIndex: 0, count: count,xhtmlSentences: xhtmlSentences, audioFile: firstSentenceRange.audioFile)
                 interpolated.append(contentsOf: interpolatedSentences)
                 progressUpdate(interpolatedSentences.count)
             }
@@ -1137,7 +1233,7 @@ extension Aligner {
             
             let startPoint = crossesAudioBoundary ? 0.0 : interpolated.last!.sentenceRange.end
             
-            let interpolatedSentences = makeInterpolated(start: startPoint, duration:diff, startSentenceIndex:lastAlignedSentence.chapterSentenceId + 1 , count: missingCount, chapterSentences: chapterSentences, audioFile: gapAudioFile)
+            let interpolatedSentences = makeInterpolated(start: startPoint, duration:diff, startSentenceIndex:lastAlignedSentence.sentenceId + 1 , count: missingCount, xhtmlSentences: xhtmlSentences, audioFile: gapAudioFile)
             interpolated += interpolatedSentences
             progressUpdate(interpolatedSentences.count)
             interpolated.append(currentSentence)
@@ -1147,12 +1243,12 @@ extension Aligner {
             return interpolated
         }
         
-        let missingAtEnd = chapterSentences.count - last.chapterSentenceId - 1
+        let missingAtEnd = xhtmlSentences.count - last.sentenceId - 1
         guard missingAtEnd > 0 else {
             return interpolated
         }
         
-        let interpolatedSentences = makeInterpolated(start:  last.sentenceRange.end, duration:0.25, startSentenceIndex:last.chapterSentenceId + 1 , count: missingAtEnd, chapterSentences: chapterSentences, audioFile: last.sentenceRange.audioFile)
+        let interpolatedSentences = makeInterpolated(start:  last.sentenceRange.end, duration:0.25, startSentenceIndex:last.sentenceId + 1 , count: missingAtEnd, xhtmlSentences: xhtmlSentences, audioFile: last.sentenceRange.audioFile)
         interpolated += interpolatedSentences
         progressUpdate(interpolatedSentences.count)
         
@@ -1185,7 +1281,7 @@ extension Aligner {
         let absoluteStart = max(0,alignedSentences.first!.sentenceRange.absoluteStart - 60)
         let absoluteEnd = alignedSentences.last!.sentenceRange.absoluteStart + 60
         let unassignedTimeStamps = timeline.filter {
-            if $0.absoluteStart < absoluteStart  || $0.absoulteEnd > absoluteEnd {
+            if $0.absoluteStart < absoluteStart  || $0.absoluteEnd > absoluteEnd {
                 return false
             }
             return !assignedTimeStamps.contains( $0.index )
@@ -1228,9 +1324,11 @@ extension Aligner {
                 start: wt.start,
                 end: wt.end,
                 audioFile: sentenceRange.audioFile,
-                voiceLen: -1,
+                transcriptionTokens: [],
+                //voiceLen: -1,
                 segmentIndex: -1,
-                tokenTypeGuess: .missing
+                tokenTypeGuess: .missing,
+                isInterpolated: true
             )
             fill.startOffset = prevEnd + 1
             fill.endOffset = nextStart > 0 ? nextStart - 1 : prevEnd + 1
@@ -1265,8 +1363,8 @@ extension Aligner {
     func rebuildIfNeeded( alignedSentence:AlignedSentence, alignedSentences:[AlignedSentence] ) -> [AlignedSentence] {
         
         let sentenceRange = alignedSentence.sentenceRange
-        let chapterSentence = alignedSentence.chapterSentence
-        let chapterSentenceIdOffset = (alignedSentences.first?.chapterSentenceId ?? 0) - 0
+        let chapterSentence = alignedSentence.xhtmlSentence
+        let chapterSentenceIdOffset = (alignedSentences.first?.sentenceId ?? 0) - 0
 
         var rebuiltSentences:[AlignedSentence] = []
         
@@ -1290,22 +1388,22 @@ extension Aligner {
         logger.log(.debug, "Suspicious \(alignedSentence)")
 
         let audioFile = alignedSentence.sentenceRange.audioFile.filePath
-        guard let nextFoundSentence = ( alignedSentences.first { $0.sentenceRange.audioFile.filePath == audioFile && $0.chapterSentenceId > alignedSentence.chapterSentenceId && $0.matchType != .interpolated && !$0.sharedTimeStamp }) else {
+        guard let nextFoundSentence = ( alignedSentences.first { $0.sentenceRange.audioFile.filePath == audioFile && $0.sentenceId > alignedSentence.sentenceId && $0.matchType != .interpolated && !$0.sharedTimeStamp }) else {
             return []
         }
-        guard let prevFoundSentence = (alignedSentences.reversed().first { $0.sentenceRange.audioFile.filePath == audioFile && $0.chapterSentenceId < alignedSentence.chapterSentenceId && ( ($0.matchType != .interpolated && !$0.sharedTimeStamp) || $0.chapterSentenceId == 0)  }) else {
+        guard let prevFoundSentence = (alignedSentences.reversed().first { $0.sentenceRange.audioFile.filePath == audioFile && $0.sentenceId < alignedSentence.sentenceId && ( ($0.matchType != .interpolated && !$0.sharedTimeStamp) || $0.sentenceId == 0)  }) else {
             return []
         }
         let durationToAllocate = nextFoundSentence.sentenceRange.end - prevFoundSentence.sentenceRange.start
         var lastEnd:TimeInterval = prevFoundSentence.sentenceRange.start
         
-        let sentences = Array(alignedSentences[(prevFoundSentence.chapterSentenceId-chapterSentenceIdOffset) ... (nextFoundSentence.chapterSentenceId-chapterSentenceIdOffset)])
+        let sentences = Array(alignedSentences[(prevFoundSentence.sentenceId-chapterSentenceIdOffset) ... (nextFoundSentence.sentenceId-chapterSentenceIdOffset)])
         
         //let segmentIndexes = sentences.flatMap { $0.sentenceRange.segmentIndexes }
         //let segments = segmentIndexes.map { segments[$0] }
         
         let totalVlen = sentences.map { sentence in
-            return ( sentence.chapterSentence + " " ).voiceLength
+            return ( sentence.xhtmlSentence + " " ).voiceLength
         } .reduce(0, +)
         let secondsPerVlen = durationToAllocate / totalVlen
         
@@ -1314,10 +1412,10 @@ extension Aligner {
                 rebuiltSentences.append(sentence)
             }
             
-            let vlen = (sentence.chapterSentence + " ").voiceLength
+            let vlen = (sentence.xhtmlSentence + " ").voiceLength
             let nuSentenceDuration:TimeInterval = Double(vlen) * secondsPerVlen
             sentence.sentenceRange.start = lastEnd.roundToMs()
-            if sentence.chapterSentenceId != nextFoundSentence.chapterSentenceId {
+            if sentence.sentenceId != nextFoundSentence.sentenceId {
                 let newEnd:TimeInterval = lastEnd + nuSentenceDuration
                 if newEnd > sentence.sentenceRange.start {
                     sentence.sentenceRange.end = newEnd.roundToMs()
@@ -1337,7 +1435,7 @@ extension Aligner {
         
         for alignedSentence in alignedSentences {
             let sentenceRange = alignedSentence.sentenceRange
-            let chapterSentence = alignedSentence.chapterSentence
+            let chapterSentence = alignedSentence.xhtmlSentence
             
             if chapterSentence.isEmpty || chapterSentence.isAllWhiteSpaceOrPunct {
                 if chapterSentence.count < 3 {
@@ -1348,9 +1446,9 @@ extension Aligner {
             
             let rebuilt = rebuildIfNeeded(alignedSentence: alignedSentence, alignedSentences: alignedSentences)
             for r in rebuilt {
-                if !rebuiltIds.contains(r.chapterSentenceId) {
+                if !rebuiltIds.contains(r.sentenceId) {
                     rebuiltSentences.append(r)
-                    rebuiltIds.insert(r.chapterSentenceId)
+                    rebuiltIds.insert(r.sentenceId)
                 }
             }
             
@@ -1376,14 +1474,15 @@ extension Aligner {
     }
 }
 
+/*
 extension Aligner {
     func exportTestJson( withAlignedSentences alignedSentences: [AlignedSentence], chapterSentences:[String], skippedSentences:[SkippedSentence], transcription:Transcription )  {
         let startChapterSentenceId = max( 0 , skippedSentences.first!.chapterSentenceId - 5)
         let endChapterSentenceId = min( skippedSentences.last!.chapterSentenceId + 5 , chapterSentences.count - 1 )
         let chapterText = chapterSentences[startChapterSentenceId...endChapterSentenceId].joined(separator: " ")
         
-        let firstAlignedSentence = alignedSentences.first { $0.chapterSentenceId == startChapterSentenceId }
-        let lastAlignedSentence = alignedSentences.first { $0.chapterSentenceId == endChapterSentenceId }
+        let firstAlignedSentence = alignedSentences.first { $0.sentenceId == startChapterSentenceId }
+        let lastAlignedSentence = alignedSentences.first { $0.sentenceId == endChapterSentenceId }
         let startTimeStamp = firstAlignedSentence!.sentenceRange.timeStamps.first!
         let endTimeStamp = lastAlignedSentence!.sentenceRange.timeStamps.last!
         
@@ -1403,4 +1502,4 @@ extension Aligner {
         let encodedTimeLine = try! encoder.encode(wordTimeLine)
         try! encodedTimeLine.write(to: URL(fileURLWithPath: "/tmp/timeline.json"))
     }
-}
+}*/

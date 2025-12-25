@@ -10,7 +10,7 @@
 
 import SwiftSoup
 
-fileprivate let dataSpaceAfterAttrName = "data-space-after"
+fileprivate let dataSpaceAfterAttrName = XHTMLTagger.dataSpaceAfterAttrName
 
 extension Node {
     private var inlineTags: Set<String> {
@@ -147,11 +147,19 @@ extension Node {
                     return
                 }
                 if let elc = c as? Element {
-                    if sawText && !body.isEmpty && !elc.isEmpty() {
-                        if !body.last!.isWhitespace {
-                            if prev?.hasAttr(XHTMLTagger.dataSpaceAfterAttrName) ?? false {
+                    if sawText && !body.isEmpty /*&& !elc.isEmpty()*/ {
+                        if let prevElement = prev as? Element {
+                            let prevElementsWithSpaceAttr = try prevElement.getElementsByAttribute(XHTMLTagger.dataSpaceAfterAttrName)
+                            if !body.last!.isWhitespace && prevElement.hasAttr(XHTMLTagger.dataSpaceAfterAttrName) {
                                 body += " "
                             }
+                            else if !prevElementsWithSpaceAttr.isEmpty {
+                                body += " "
+                            }
+                            /*
+                            if prev?.hasAttr(XHTMLTagger.dataSpaceAfterAttrName) ?? false {
+                                body += " "
+                            }*/
                         }
                     }
                     body += try elc.xmlFormatted(indentLevel: 0)
@@ -160,14 +168,29 @@ extension Node {
             }
             return indent + openTag + body + closeTag
         }
-
+        
         var out = indent + openTag + "\n"
+
         for c in children {
             let line = try c.xmlFormatted(indentLevel: indentLevel+1)
             if !line.isEmpty {
                 out += line + "\n"
             }
         }
+         /*
+        for c in children {
+            var line = try c.xmlFormatted(indentLevel: indentLevel+1)
+            if !line.isEmpty {
+                if let ce = c as? Element {
+                    let elementsWithSpaceAttr = try ce.getElementsByAttribute(XHTMLTagger.dataSpaceAfterAttrName)
+                    let needsSpace = ce.hasAttr(XHTMLTagger.dataSpaceAfterAttrName) || !elementsWithSpaceAttr.isEmpty()
+                    if needsSpace && !(line.last?.isWhitespace ?? true) {
+                        line += " "
+                    }
+                }
+                out += line + "\n"
+            }
+        }*/
         out += indent + closeTag
         return out
     }

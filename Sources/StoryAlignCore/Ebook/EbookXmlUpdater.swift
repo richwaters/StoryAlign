@@ -38,6 +38,11 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
         let nThreads = sessionConfig.throttle ? 1 : 0
         let _ = try await alignedChapters.enumerated().asyncCompactMap(concurrency: nThreads) { (index,chapter) -> (URL, String)? in
             let manifestItem = chapter.manifestItem
+            
+            defer {
+                sessionConfig.progressUpdater?.updateProgress(for: .xml, msgPrefix: "Tagging", increment: manifestItem.xmlText.count, total: totalBytes, unit:.bytes)
+            }
+            
             guard let filePath = manifestItem.filePath else {
                 return nil
             }
@@ -45,9 +50,7 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
                 return nil
             }
             logger.log( .info, "Updating \(manifestItem.id)")
-            let bytes = manifestItem.xmlText.count
-            sessionConfig.progressUpdater?.updateProgress(for: .xml, msgPrefix: "Tagged", increment: bytes, total: totalBytes, unit:.bytes)
-            let nuText = try await XHTMLTagger().tag(epub:inEbook, manifestItem: manifestItem, chapterId: manifestItem.id)
+            let nuText = try await XHTMLTagger(sessionConfig: sessionConfig).tag(epub:inEbook, alignedChapter: chapter)
             try nuText.write(to: filePath, atomically: true, encoding: .utf8)
             logger.log( .info, "\(manifestItem.id) update complete. ( \(index)/\(total) )")
             return( filePath, nuText)
@@ -63,8 +66,19 @@ public struct XMLUpdater : SessionConfigurable,Sendable {
             if alignedChapter.allSentenceRanges.isEmpty {
                 return nil
             }
+            
+            let alignedUnits = sessionConfig.granularity!.useWordTokenizer ? alignedChapter.alignedWords : alignedChapter.alignedSentences
+            
+            let validSentenceRanges:[SentenceRange] = alignedUnits.compactMap {
+                if $0.sentenceRange.duration == 0 {
+                    logger.log( .info, "Skipping 0-duration sentence range for \($0.xhtmlSentence)")
+                    return nil
+                }
+                return $0.sentenceRange
+            }
+            
             logger.log(.info, "Creating MediaOverlay for \(manifestItem.id)")
-            let mo = MediaOverlay(baseURL: epub.opfURL.deletingLastPathComponent(), manifestItem: manifestItem, sentenceRanges: alignedChapter.allSentenceRanges )
+            let mo = MediaOverlay(baseURL: epub.opfURL.deletingLastPathComponent(), manifestItem: manifestItem, sentenceRanges: validSentenceRanges )
             logger.log(.info, "Completed MediaOverlay for \(manifestItem.id)")
             return mo
         }

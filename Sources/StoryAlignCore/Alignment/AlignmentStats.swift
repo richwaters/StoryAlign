@@ -47,6 +47,7 @@ struct ChapterSentences:Codable {
 
 public struct AlignmentStats : Codable {
     var chapterSentenceCount:Int = 0
+    var wordCount:Int = 0
     var exactMatches:Int = 0
     var trimmedLeadingMatches:Int = 0
     var matchesIgnoringEndsPunctuation:Int = 0
@@ -57,6 +58,7 @@ public struct AlignmentStats : Codable {
     var skipped:Int = 0
     var missedChapters:Int = 0
     var missedChapterSentences:Int = 0
+    var smilSpans:Int = 0
     
     var examined : Int {
         chapterSentenceCount
@@ -91,6 +93,7 @@ public struct AlignmentStats : Codable {
         let alignedSentences = alignedChapter.alignedSentences
                 
         self.chapterSentenceCount = chapterSentences.count
+        self.wordCount = alignedChapter.alignedSentencesWordCount
         self.skipped = skippedSentences.count
         self.exactMatches = alignedSentences.filter { $0.matchType == .exact }.count
         self.trimmedLeadingMatches = alignedSentences.filter { $0.matchType == .trimmedLeading }.count
@@ -103,11 +106,13 @@ public struct AlignmentStats : Codable {
 
         self.missedChapters = alignedChapter.isMissingChapter ? 1 : 0
         self.missedChapterSentences = alignedChapter.isMissingChapter ? alignedChapter.missingSentences.count : 0
+        self.smilSpans = alignedChapter.alignedWords.isEmpty ? alignedChapter.alignedSentences.count : alignedChapter.alignedWords.count
     }
     
     static public func + (lhs: AlignmentStats, rhs: AlignmentStats) -> AlignmentStats {
         var result = AlignmentStats()
         result.chapterSentenceCount = lhs.chapterSentenceCount + rhs.chapterSentenceCount
+        result.wordCount = lhs.wordCount + rhs.wordCount
         result.skipped =  lhs.skipped + rhs.skipped
         result.nearMatchs = lhs.nearMatchs + rhs.nearMatchs
         result.trimmedLeadingMatches = lhs.trimmedLeadingMatches + rhs.trimmedLeadingMatches
@@ -120,6 +125,7 @@ public struct AlignmentStats : Codable {
         
         result.missedChapters = lhs.missedChapters + rhs.missedChapters
         result.missedChapterSentences = lhs.missedChapterSentences + rhs.missedChapterSentences
+        result.smilSpans = lhs.smilSpans + rhs.smilSpans
         return result
     }
     static public func += (lhs: inout AlignmentStats, rhs: AlignmentStats) {
@@ -132,6 +138,8 @@ extension AlignmentStats : CustomStringConvertible, CustomDebugStringConvertible
     public var description: String {
         """
         Sentences: \(examined)
+        Words:\(wordCount)
+        Spans: \(smilSpans)
         Matched: \(succeeded) (\(percentSuccess)%)
         Missed: \(missed) (\(percentMissed)%)
 
@@ -252,7 +260,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
             return nil
         }
         let sentences = zscoreTuples.map { (alignedSentence, zscore) in
-            let chapterSentence = ChapterReport.ReportSentence(chapterSentenceId: alignedSentence.chapterSentenceId, chapterSentence: alignedSentence.chapterSentence, transcriptionSentence: alignedSentence.sentenceRange.sentenceText, duration: alignedSentence.sentenceRange.duration, pace: alignedSentence.secondsPerWord, zscore: zscore)
+            let chapterSentence = ChapterReport.ReportSentence(chapterSentenceId: alignedSentence.sentenceId, chapterSentence: alignedSentence.xhtmlSentence, transcriptionSentence: alignedSentence.sentenceRange.sentenceText, duration: alignedSentence.sentenceRange.duration, pace: alignedSentence.secondsPerWord, zscore: zscore)
             return chapterSentence
         }
         return ChapterReport(
@@ -270,7 +278,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         
         return alignedChapters.compactMap { chapter in
             let zscoreTuples = chapter.alignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
-                let bin = sentence.chapterSentence.count / binSize
+                let bin = sentence.xhtmlSentence.count / binSize
                 guard let (med, mad) = statsByBin[bin] else { return nil }
                 let mz = sentence.secondsPerChar.modifiedZcore( forMedian: med, medianAbsoluteDeviation: mad)
                 guard mz < threshold else {
@@ -295,7 +303,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
             //let words = $0.chapterSentenceWords
             //return words.count/binSize
             //Int($0.chapterSentence.voiceLength) / binSize
-            $0.chapterSentence.count / binSize
+            $0.xhtmlSentence.count / binSize
         }
         return groups.compactMapValues { bucket in
             //let paces = bucket.map { $0.secondsPerWord }
@@ -316,7 +324,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         
         return alignedChapters.compactMap { chapter in
             let zscoreTuples = chapter.interiorAlignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
-                let bin = sentence.chapterSentence.count / binSize
+                let bin = sentence.xhtmlSentence.count / binSize
                 guard let (med, mad) = statsByBin[bin] else { return nil }
                 let mz = sentence.secondsPerChar.modifiedZcore(
                     forMedian: med,
@@ -342,7 +350,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         let slowPacedChapSentenceIds = slowPaceChapterSentenceIds
         return alignedChapters.compactMap { chapter in
             let zscoreTuples = chapter.interiorAlignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
-                if slowPacedChapSentenceIds.contains(where: { $0.chapterId == chapter.manifestItem.id && $0.sentenceId == sentence.chapterSentenceId }) {
+                if slowPacedChapSentenceIds.contains(where: { $0.chapterId == chapter.manifestItem.id && $0.sentenceId == sentence.sentenceId }) {
                     return nil
                 }
                 let mz = sentence.sentenceRange.duration.modifiedZcore( forMedian: median,  medianAbsoluteDeviation: mad )
@@ -377,7 +385,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         
         return alignedChapters.compactMap { chapter in
             let zscoreTuples = chapter.alignedSentences.compactMap { sentence -> (AlignedSentence, Double)? in
-                if fastPacedChapSentenceIds.contains(where: { $0.chapterId == chapter.manifestItem.id && $0.sentenceId == sentence.chapterSentenceId }) {
+                if fastPacedChapSentenceIds.contains(where: { $0.chapterId == chapter.manifestItem.id && $0.sentenceId == sentence.sentenceId }) {
                     return nil
                 }
                 let mz = sentence.sentenceRange.duration.modifiedZcore( forMedian: median,  medianAbsoluteDeviation: mad )
@@ -441,7 +449,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
         
         let totalSentences = (forChapter.manifestItem.xhtmlSentences.count)
         let skippedSentenceIds = Set( forChapter.skippedSentences.map { $0.chapterSentenceId } )
-        let rebuiltSentenceIds = Set( forChapter.rebuiltSentences.map { $0.chapterSentenceId } )
+        let rebuiltSentenceIds = Set( forChapter.rebuiltSentences.map { $0.sentenceId } )
         let fastPaceSentenceIds = Set( fastPaceChapterSentenceIds.filter { $0.chapterId == forChapter.manifestItem.id }.map(\.sentenceId) )
         let slowPaceSentenceIds = Set( slowPaceChapterSentenceIds.filter { $0.chapterId == forChapter.manifestItem.id }.map(\.sentenceId) )
         let shortDurationSentenceIds = Set( shortDurationChapterSentenceIds.filter { $0.chapterId == forChapter.manifestItem.id }.map(\.sentenceId) )
@@ -449,24 +457,24 @@ public class AlignmentReportBuilder : SessionConfigurable {
         
         var lastSentenceId = -1
         let weights:[Double] = forChapter.alignedSentences.map {
-            if ($0.chapterSentenceId - 1 ) != lastSentenceId {
+            if ($0.sentenceId - 1 ) != lastSentenceId {
                 logger.log(.error, "Chapter missing sentence")
             }
-            lastSentenceId = $0.chapterSentenceId
+            lastSentenceId = $0.sentenceId
             
-            if fastPaceSentenceIds.contains($0.chapterSentenceId) {
+            if fastPaceSentenceIds.contains($0.sentenceId) {
                 return 0.0
             }
-            if slowPaceSentenceIds.contains($0.chapterSentenceId) {
+            if slowPaceSentenceIds.contains($0.sentenceId) {
                 return 0.0
             }
-            if shortDurationSentenceIds.contains($0.chapterSentenceId) {
+            if shortDurationSentenceIds.contains($0.sentenceId) {
                 return 0.1
             }
-            if longDurationSentenceIds.contains( $0.chapterSentenceId ) {
+            if longDurationSentenceIds.contains( $0.sentenceId ) {
                 return 0.3
             }
-            if rebuiltSentenceIds.contains( $0.chapterSentenceId ) {
+            if rebuiltSentenceIds.contains( $0.sentenceId ) {
                 return 0.4
             }
             if $0.matchType == .interpolated {
@@ -477,7 +485,7 @@ public class AlignmentReportBuilder : SessionConfigurable {
                 return 0.8
             }
             
-            if skippedSentenceIds.contains( $0.chapterSentenceId ) {
+            if skippedSentenceIds.contains( $0.sentenceId ) {
                 // These are sentences that were initially skipped but then later aligned in between chapters
                 return 0.9
             }

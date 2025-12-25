@@ -144,13 +144,12 @@ struct SmilChecker {
                 continue
             }
             
-            let sentences = NLTokenizer.tokenizeSentences(text: bareText)
+            let sentences = tokenizeSentences(text: bareText)
             if sentences.count > 3 {
                 report( "Too many sentences in frag", clip:clip, frag:txt)
             }
 
-            
-            let words = NLTokenizer.tokenizeWords(text: bareText)
+            let words = tokenizeWords(text: bareText)
             let wc = words.count
             
             if wc == 0 {
@@ -208,6 +207,40 @@ struct SmilChecker {
                 }
             }
         }
+    }
+}
+
+extension SmilChecker {
+    func tokenizeSentences(text: String) -> [String] {
+        let tokenizer = NLTokenizer(unit: .sentence)
+        tokenizer.string = text
+        var sentences = [String]()
+        
+        tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { tokenRange, _ in
+            let sentence = text[tokenRange]
+            if !sentence.trim().isEmpty {
+                sentences.append(String(sentence))
+            }
+            return true
+        }
+        
+        return sentences
+    }
+    
+    func tokenizeWords(text: String) -> [String] {
+        let tokenizer = NLTokenizer(unit: .word)
+        tokenizer.string = text
+        var words = [String]()
+        
+        tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { tokenRange, _ in
+            let word = text[tokenRange]
+            if !word.trim().isEmpty {
+                words.append(String(word))
+            }
+            return true
+        }
+        
+        return words
     }
 }
 

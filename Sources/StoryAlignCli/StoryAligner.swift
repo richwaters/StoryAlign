@@ -85,6 +85,15 @@ struct StoryAligner {
             try persistIfApplicable(stageRunTimes: stageRunTimes, eBook: eBook, audioBook: audioBook , transcriptions: transcriptions, alignedChapters: alignedChapters, xmlFileUpdateCompleted: true, exportCompleted:true)
         }
         
+        if sessionConfig.runStage < .report {
+            return nil
+        }
+        
+        if sessionConfig.reportType == .none {
+            //sessionConfig.progressUpdater?.updateProgress(for: .report, msgPrefix: "Completed", increment: 1, total: 1, unit: .none )
+            return nil
+        }
+
         stageStartTme = Date().timeIntervalSinceReferenceDate
         stageRunTimes[.report] =  stageStartTme ..< Date().timeIntervalSinceReferenceDate
         let reportBuilder = AlignmentReportBuilder(sessionConfig: sessionConfig, alignedChapters: alignedChapters, rawTranscriptions: transcriptions, stageRunTimes: stageRunTimes)
@@ -92,10 +101,6 @@ struct StoryAligner {
         stageRunTimes[.report] =  stageStartTme ..< Date().timeIntervalSinceReferenceDate
         rpt.stageRunTimes = stageRunTimes
 
-        if sessionConfig.reportType == .none {
-            //sessionConfig.progressUpdater?.updateProgress(for: .report, msgPrefix: "Completed", increment: 1, total: 1, unit: .none )
-            return nil
-        }
         
         return rpt
     }
