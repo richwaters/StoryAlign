@@ -19,6 +19,8 @@ public enum ProgressUpdaterUnit : Int, Sendable {
     case bytes
     case seconds
     case sentences
+    case words
+    case phrases
 }
 
 public protocol ProgressUpdater : AnyObject, Sendable {
@@ -30,6 +32,11 @@ public protocol ProgressUpdater : AnyObject, Sendable {
 }
 
 public extension ProgressUpdater {
+    func resetProgress(for stage: ProcessingStage) {
+        updateQueue.async {
+            self.stageProgress[stage] = 0.0
+        }
+    }
     func updateProgress(for stage: ProcessingStage, msgPrefix: String, increment: Double, total: Double? = nil, unit: ProgressUpdaterUnit) {
         updateQueue.async { [weak self] in
             guard let self = self else {
@@ -88,12 +95,13 @@ public extension ProgressUpdater {
             return "\(countStr)/\(totStr) \(sfx)"
         }
         
-        if unit == .sentences {
+        if unit == .sentences || unit == .words || unit == .phrases {
+            let unitStr = (unit == .sentences) ? "sentences" : (unit == .phrases) ? "phrases" : "words"
             let (divisor,sfx,decimals) = {
                 if count > GH_BYTES_PER_MiB {
-                    return (GH_BYTES_PER_MiB, "M sentences",1)
+                    return (GH_BYTES_PER_MiB, "M \(unitStr)",1)
                 }
-                return (1.0, " sentences",0)
+                return (1.0, " \(unitStr)",0)
             }()
             let fmt = "%.\(decimals)f"
             let countStr = String(format:fmt, count/divisor)

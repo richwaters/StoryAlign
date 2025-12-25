@@ -16,12 +16,21 @@ final class CliProgressUpdater : ProgressUpdater, @unchecked Sendable {
 
     let updateQueue = DispatchQueue( label: "com.goodhumans.storyalign.cli.progressupdater" )
     func show(stageProgress: Double, stageTotal: Double, overallCompletionPercent: Double, msgPregix msgPrefix: String, unit:ProgressUpdaterUnit) {
-        
         let countOverTot = format(count: stageProgress, overTot: stageTotal, unit: unit)
         let msg = "\(msgPrefix) \(countOverTot)"
-        singleLineProgress(message: msg, percent: Int(overallCompletionPercent))
+        let stagePercent = stageTotal == 0 ? 0 : Int(stageProgress / stageTotal * 100)
+        singleLineProgress(message: msg, percent: stagePercent)
     }
     
+    func singleLineProgress( message: String, percent: Int) {
+        let msg = message
+        let padding = String(repeating: " ", count: max(0, 64 - msg.count))
+        let terminator = percent == 100 ? "\n" : ""
+        print("\r\(msg)\(padding) \(percent)%", terminator: terminator)
+        fflush(stdout)
+    }
+    
+    /*
     func singleLineProgress( message: String, percent: Int) {
         let msg = message
         let padding = String(repeating: " ", count: max(0, 64 - msg.count))
@@ -31,5 +40,5 @@ final class CliProgressUpdater : ProgressUpdater, @unchecked Sendable {
             print() ;
             fflush(stdout)
         }
-    }
+    }*/
 }
