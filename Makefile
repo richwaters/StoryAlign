@@ -18,7 +18,7 @@ test:
 	@echo "*******"
 	@echo "Summary"
 	@echo "*******"
-	@grep "Executed" /tmp/test.out
+	@grep -B1 "Executed" /tmp/test.out
 	
 install:build-release
 	mkdir -p ./bin
