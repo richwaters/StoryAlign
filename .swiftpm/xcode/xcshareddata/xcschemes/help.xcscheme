@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--version"
+            argument = "--help-md"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
