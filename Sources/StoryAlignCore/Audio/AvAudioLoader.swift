@@ -64,7 +64,8 @@ struct AvAudioLoader : AudioLoader {
 
 extension AvAudioLoader {
     func load16kMonoPCM_viaAVAudioFile(_ url: URL) throws -> [Float] {
-        let file = try AVAudioFile(forReading: url)
+        let file = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
+
         let inFmt  = file.processingFormat
         let outFmt = AVAudioFormat(
             commonFormat: .pcmFormatFloat32,
@@ -82,15 +83,15 @@ extension AvAudioLoader {
         )!
         try file.read(into: inBuf)
         
-        let ratio     = outFmt.sampleRate / inFmt.sampleRate
-        let outFrames = AVAudioFrameCount((Double(inBuf.frameLength) * ratio).rounded(.up))
-        let outBuf    = AVAudioPCMBuffer(pcmFormat: outFmt, frameCapacity: outFrames)!
+        var out: [Float] = []
+        let chunkFrames: AVAudioFrameCount = 8192
         
         final class InputState: @unchecked Sendable {
             let fmt: AVAudioFormat
             let channels: [UnsafePointer<Float>]
             let buf: AVAudioPCMBuffer
             var pos: AVAudioFramePosition = 0
+
             init(fmt: AVAudioFormat, buf: AVAudioPCMBuffer) {
                 self.fmt = fmt
                 self.buf = buf
@@ -120,13 +121,24 @@ extension AvAudioLoader {
         }
 
         var error: NSError?
-        let status = converter.convert(to: outBuf, error: &error, withInputFrom: inputBlock)
-        guard status == .haveData || status == .endOfStream else {
+
+        while true {
+            let outBuf = AVAudioPCMBuffer(pcmFormat: outFmt, frameCapacity: chunkFrames)!
+            
+            let status = converter.convert(to: outBuf, error: &error, withInputFrom: inputBlock)
+            
+            let n = Int(outBuf.frameLength)
+            if n > 0 {
+                let ptr = outBuf.floatChannelData![0]
+                out.append(contentsOf: UnsafeBufferPointer(start: ptr, count: n))
+            }
+
+            if status == .haveData { continue }
+            if status == .inputRanDry { continue }
+            if status == .endOfStream { break }
             throw error ?? NSError(domain: "AudioConversion", code: -1, userInfo: nil)
         }
-
-        let ptr = outBuf.floatChannelData![0]
-        let count = Int(outBuf.frameLength)
-        return Array(UnsafeBufferPointer(start: ptr, count: count))
+        
+        return out
     }
 }
