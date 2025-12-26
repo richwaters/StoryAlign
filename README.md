@@ -1,4 +1,12 @@
 # storyalign
+
+**This project has moved to Codeberg:**
+**https://codeberg.org/richwaters/StoryAlign**
+
+─────────────────────────────────────────────────────
+
+
+
 storyalign is a macOS command-line tool that combines an ebook with an audiobook to produce an enriched ebook containing audio narration. These enriched ebooks are sometimes called *read-aloud books*, *synchronized audio-ebooks*, *enriched epubs*, and more.
 
 These enhanced books are ideal for people who like to switch between reading and listening, as a single app is used to both read and listen. This keeps your place within the book, regardless of the current reading/listening mode. 
